@@ -1,0 +1,124 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    var tamamlanmaYuzdesi = Model.ToplamGorev == 0
+        ? 0
+        : (int)Math.Round((double)Model.TamamlananGorev * 100 / Model.ToplamGorev);
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h2 class="mb-0">Merhaba, @Model.AdSoyad 👋</h2>
+        <p class="text-muted mb-0">İşte görevlerinin özeti.</p>
+    </div>
+    <a asp-controller="Gorev" asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Yeni Görev
+    </a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card stat-toplam h-100">
+            <div class="card-body">
+                <div class="stat-label">Toplam</div>
+                <div class="stat-value">@Model.ToplamGorev</div>
+                <i class="bi bi-collection stat-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <a asp-controller="Gorev" asp-action="Bekleyen" class="text-decoration-none">
+            <div class="card stat-card stat-bekleyen h-100">
+                <div class="card-body">
+                    <div class="stat-label">Bekleyen</div>
+                    <div class="stat-value">@Model.BekleyenGorev</div>
+                    <i class="bi bi-hourglass-split stat-icon"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-lg-3">
+        <a asp-controller="Gorev" asp-action="Tamamlanan" class="text-decoration-none">
+            <div class="card stat-card stat-tamamlanan h-100">
+                <div class="card-body">
+                    <div class="stat-label">Tamamlanan</div>
+                    <div class="stat-value">@Model.TamamlananGorev</div>
+                    <i class="bi bi-check-circle stat-icon"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card stat-iptal h-100">
+            <div class="card-body">
+                <div class="stat-label">İptal</div>
+                <div class="stat-value">@Model.IptalGorev</div>
+                <i class="bi bi-x-circle stat-icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.ToplamGorev > 0)
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-semibold"><i class="bi bi-trophy me-1 text-primary"></i> Tamamlanma Oranı</span>
+                <span class="fw-bold text-primary">%@tamamlanmaYuzdesi</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: @tamamlanmaYuzdesi%;"
+                     aria-valuenow="@tamamlanmaYuzdesi" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="text-muted small mt-2">
+                @Model.TamamlananGorev / @Model.ToplamGorev görev tamamlandı
+            </div>
+        </div>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold"><i class="bi bi-clock-history me-1 text-primary"></i> Son Görevler</span>
+        <a asp-controller="Gorev" asp-action="Index" class="small text-decoration-none">
+            Tümünü gör <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.SonGorevler.Any())
+        {
+            <div class="empty-state">
+                <i class="bi bi-clipboard-x empty-icon"></i>
+                <p class="mb-2">Henüz görev yok.</p>
+                <a asp-controller="Gorev" asp-action="Create" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i> İlk görevini ekle
+                </a>
+            </div>
+        }
+        else
+        {
+            <table class="table mb-0">
+                <tbody>
+                    @foreach (var gorev in Model.SonGorevler)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-controller="Gorev" asp-action="Detail" asp-route-id="@gorev.Id"
+                                   class="gorev-baslik-link fw-semibold">
+                                    @gorev.Baslik
+                                </a>
+                            </td>
+                            <td class="text-end">
+                                <span class="badge @gorev.Durum.CssClass()">@gorev.Durum.Etiket()</span>
+                            </td>
+                            <td class="text-end text-muted small" style="width:160px;">
+                                <i class="bi bi-clock me-1"></i>@gorev.OlusturmaTarihi.ToString("dd.MM.yyyy HH:mm")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

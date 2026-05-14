@@ -1,0 +1,82 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Kayıt Ol";
+}
+
+<div class="auth-wrapper">
+    <div class="row w-100 g-4 align-items-stretch" style="max-width: 980px;">
+        <div class="col-md-6 d-none d-md-block">
+            <div class="auth-hero h-100">
+                <h1>Aramıza katıl</h1>
+                <p class="opacity-75 mb-4">Birkaç saniyede ücretsiz hesabını oluştur, görevlerini hemen organize etmeye başla.</p>
+
+                <div class="hero-feature"><i class="bi bi-lightning-charge"></i><span>Saniyeler içinde kayıt</span></div>
+                <div class="hero-feature"><i class="bi bi-shield-check"></i><span>Şifreler güvenli şekilde saklanır</span></div>
+                <div class="hero-feature"><i class="bi bi-cloud-arrow-up"></i><span>Verilerin her zaman senin</span></div>
+                <div class="hero-feature"><i class="bi bi-stars"></i><span>Modern ve hızlı arayüz</span></div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="auth-card h-100">
+                <div class="text-center mb-4">
+                    <i class="bi bi-person-plus-fill text-primary" style="font-size: 2.5rem;"></i>
+                    <h3 class="mt-2">Hesap Oluştur</h3>
+                    <p class="text-muted small mb-0">Görev takip dünyasına ilk adım</p>
+                </div>
+
+                <form asp-action="Register" method="post" novalidate>
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="AdSoyad" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-person"></i></span>
+                            <input asp-for="AdSoyad" class="form-control" autocomplete="name" placeholder="Adın Soyadın" />
+                        </div>
+                        <span asp-validation-for="AdSoyad" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-envelope"></i></span>
+                            <input asp-for="Email" class="form-control" autocomplete="email" placeholder="ornek@mail.com" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Sifre" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-lock"></i></span>
+                            <input asp-for="Sifre" class="form-control" autocomplete="new-password" placeholder="En az 6 karakter" />
+                        </div>
+                        <span asp-validation-for="Sifre" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="SifreTekrar" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-lock-fill"></i></span>
+                            <input asp-for="SifreTekrar" class="form-control" autocomplete="new-password" placeholder="Şifreni tekrar gir" />
+                        </div>
+                        <span asp-validation-for="SifreTekrar" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mt-2">
+                        <i class="bi bi-person-plus me-1"></i> Kayıt Ol
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">Zaten hesabın var mı? <a asp-action="Login" class="fw-semibold">Giriş yap</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

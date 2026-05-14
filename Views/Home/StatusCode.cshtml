@@ -1,0 +1,39 @@
+@{
+    var code = (int)(ViewBag.Code ?? 0);
+    var baslik = ViewBag.Baslik as string ?? "Hata";
+    var mesaj = ViewBag.Mesaj as string ?? "Bir hata oluştu.";
+    ViewData["Title"] = baslik;
+
+    var (ikon, renk) = code switch
+    {
+        404 => ("bi-compass", "text-primary"),
+        403 => ("bi-shield-exclamation", "text-warning"),
+        401 => ("bi-lock", "text-warning"),
+        500 => ("bi-bug-fill", "text-danger"),
+        _ => ("bi-question-circle", "text-secondary")
+    };
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-body p-5 text-center">
+                <div class="mb-3">
+                    <i class="bi @ikon @renk" style="font-size: 4rem;"></i>
+                </div>
+                <div class="display-1 fw-bold @renk mb-0">@code</div>
+                <h2 class="mb-2">@baslik</h2>
+                <p class="text-muted">@mesaj</p>
+
+                <div class="d-flex justify-content-center gap-2 mt-4">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                        <i class="bi bi-house me-1"></i> Ana Sayfaya Dön
+                    </a>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Geri Git
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

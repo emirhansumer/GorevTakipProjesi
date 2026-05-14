@@ -1,0 +1,398 @@
+:root {
+    --gt-primary: #6366f1;
+    --gt-primary-dark: #4f46e5;
+    --gt-primary-light: #eef2ff;
+    --gt-accent: #ec4899;
+    --gt-bg: #f8fafc;
+    --gt-surface: #ffffff;
+    --gt-border: #e2e8f0;
+    --gt-text: #1e293b;
+    --gt-text-muted: #64748b;
+
+    --gt-bekliyor: #f59e0b;
+    --gt-bekliyor-bg: #fef3c7;
+    --gt-tamamlandi: #10b981;
+    --gt-tamamlandi-bg: #d1fae5;
+    --gt-iptal: #94a3b8;
+    --gt-iptal-bg: #f1f5f9;
+
+    --bs-primary: var(--gt-primary);
+    --bs-primary-rgb: 99, 102, 241;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    background-color: var(--gt-bg);
+    color: var(--gt-text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+/* ===== Navbar ===== */
+.navbar.bg-primary {
+    background: linear-gradient(135deg, var(--gt-primary) 0%, var(--gt-primary-dark) 100%) !important;
+    box-shadow: 0 2px 12px rgba(99, 102, 241, 0.15);
+}
+
+.navbar .navbar-brand {
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+}
+
+.navbar .nav-link {
+    font-weight: 500;
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem !important;
+    margin: 0 2px;
+    transition: background-color 0.15s ease;
+}
+
+.navbar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.navbar .btn-link.nav-link {
+    background: none;
+    border: none;
+}
+
+/* ===== Buttons ===== */
+.btn {
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.45rem 1rem;
+    transition: transform 0.08s ease, box-shadow 0.15s ease;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn-primary {
+    background-color: var(--gt-primary);
+    border-color: var(--gt-primary);
+    box-shadow: 0 1px 2px rgba(99, 102, 241, 0.25);
+}
+
+.btn-primary:hover {
+    background-color: var(--gt-primary-dark);
+    border-color: var(--gt-primary-dark);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-outline-primary {
+    color: var(--gt-primary);
+    border-color: var(--gt-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--gt-primary);
+    border-color: var(--gt-primary);
+}
+
+.btn-sm {
+    border-radius: 6px;
+    padding: 0.25rem 0.6rem;
+}
+
+.btn:focus, .form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    border-color: var(--gt-primary);
+}
+
+/* ===== Cards ===== */
+.card {
+    border: 1px solid var(--gt-border);
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.shadow-sm {
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+}
+
+.card .card-header {
+    background-color: var(--gt-surface);
+    border-bottom: 1px solid var(--gt-border);
+    border-radius: 14px 14px 0 0 !important;
+    padding: 0.85rem 1.25rem;
+}
+
+/* Dashboard count cards */
+.stat-card {
+    border-radius: 16px;
+    border: none;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    color: white;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -8px rgba(15, 23, 42, 0.15);
+}
+
+.stat-card .stat-icon {
+    font-size: 2.4rem;
+    opacity: 0.35;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.stat-card .stat-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.9;
+}
+
+.stat-card .stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.stat-toplam   { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+.stat-bekleyen { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+.stat-tamamlanan { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+.stat-iptal    { background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%); }
+
+/* ===== Forms ===== */
+.form-control, .form-select {
+    border-radius: 8px;
+    border-color: var(--gt-border);
+    padding: 0.55rem 0.85rem;
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--gt-text);
+    margin-bottom: 0.35rem;
+}
+
+/* ===== Badges (durum) ===== */
+.badge {
+    font-weight: 600;
+    padding: 0.4em 0.7em;
+    border-radius: 999px;
+    letter-spacing: 0.01em;
+}
+
+.badge.bg-warning {
+    background-color: var(--gt-bekliyor-bg) !important;
+    color: var(--gt-bekliyor) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--gt-tamamlandi-bg) !important;
+    color: var(--gt-tamamlandi) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--gt-iptal-bg) !important;
+    color: var(--gt-iptal) !important;
+}
+
+/* ===== Tables ===== */
+.table {
+    --bs-table-hover-bg: rgba(99, 102, 241, 0.04);
+}
+
+.table > thead {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gt-text-muted);
+}
+
+.table > thead > tr > th {
+    border-bottom: 1px solid var(--gt-border);
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+}
+
+.table > tbody > tr > td {
+    padding: 0.85rem 1rem;
+    vertical-align: middle;
+}
+
+/* ===== Alerts ===== */
+.alert {
+    border-radius: 10px;
+    border: 1px solid transparent;
+}
+
+.alert-success {
+    background-color: var(--gt-tamamlandi-bg);
+    color: #065f46;
+    border-color: #a7f3d0;
+}
+
+.alert-info {
+    background-color: var(--gt-primary-light);
+    color: var(--gt-primary-dark);
+    border-color: #c7d2fe;
+}
+
+.alert-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-color: #fecaca;
+}
+
+/* ===== Nav pills (filtre sekmeleri) ===== */
+.nav-pills {
+    background: var(--gt-surface);
+    padding: 0.35rem;
+    border-radius: 10px;
+    border: 1px solid var(--gt-border);
+    display: inline-flex;
+    gap: 0.25rem;
+}
+
+.nav-pills .nav-link {
+    color: var(--gt-text-muted);
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border-radius: 7px;
+}
+
+.nav-pills .nav-link.active {
+    background-color: var(--gt-primary);
+    color: white;
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+}
+
+.nav-pills .nav-link:not(.active):hover {
+    background-color: var(--gt-primary-light);
+    color: var(--gt-primary);
+}
+
+/* ===== Auth pages (Login / Register) ===== */
+.auth-wrapper {
+    min-height: calc(100vh - 140px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-hero {
+    background: linear-gradient(135deg, var(--gt-primary) 0%, var(--gt-primary-dark) 50%, var(--gt-accent) 100%);
+    color: white;
+    border-radius: 18px;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 480px;
+}
+
+.auth-hero h1 {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.auth-hero .hero-feature {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.auth-hero .hero-feature i {
+    font-size: 1.3rem;
+    margin-right: 0.7rem;
+    opacity: 0.9;
+}
+
+.auth-card {
+    border-radius: 18px;
+    border: 1px solid var(--gt-border);
+    background: white;
+    padding: 2.5rem;
+}
+
+.auth-card h3 {
+    font-weight: 700;
+}
+
+/* ===== Profil avatar ===== */
+.profile-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gt-primary) 0%, var(--gt-accent) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+}
+
+/* ===== Detail page enhancements ===== */
+dl.row dt {
+    color: var(--gt-text-muted);
+    font-weight: 500;
+}
+
+/* ===== Footer ===== */
+.footer {
+    background: var(--gt-surface);
+    border-top: 1px solid var(--gt-border);
+    color: var(--gt-text-muted);
+    font-size: 0.875rem;
+}
+
+/* ===== Empty state ===== */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--gt-text-muted);
+}
+
+.empty-state .empty-icon {
+    font-size: 3rem;
+    color: var(--gt-border);
+    margin-bottom: 0.75rem;
+}
+
+/* ===== Progress bar ===== */
+.progress {
+    border-radius: 999px;
+    background-color: var(--gt-bg);
+    height: 8px;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, var(--gt-primary) 0%, var(--gt-accent) 100%);
+    border-radius: 999px;
+}
+
+/* ===== Görev satır hover ===== */
+.gorev-baslik-link {
+    color: var(--gt-text);
+    text-decoration: none;
+    transition: color 0.12s ease;
+}
+
+.gorev-baslik-link:hover {
+    color: var(--gt-primary);
+}

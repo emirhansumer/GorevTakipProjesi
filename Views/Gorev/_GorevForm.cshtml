@@ -1,0 +1,41 @@
+@model GorevFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+<input asp-for="Id" type="hidden" />
+
+<div class="mb-3">
+    <label asp-for="Baslik" class="form-label">
+        <i class="bi bi-card-heading me-1 text-muted"></i> Başlık
+    </label>
+    <input asp-for="Baslik" class="form-control" autofocus placeholder="Görev başlığı..." />
+    <span asp-validation-for="Baslik" class="text-danger small"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Aciklama" class="form-label">
+        <i class="bi bi-card-text me-1 text-muted"></i> Açıklama
+    </label>
+    <textarea asp-for="Aciklama" class="form-control" rows="4" placeholder="Görev hakkında detaylar..."></textarea>
+    <span asp-validation-for="Aciklama" class="text-danger small"></span>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="BitisTarihi" class="form-label">
+            <i class="bi bi-calendar-event me-1 text-muted"></i> Bitiş Tarihi
+        </label>
+        <input asp-for="BitisTarihi" class="form-control" />
+        <span asp-validation-for="BitisTarihi" class="text-danger small"></span>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label asp-for="Durum" class="form-label">
+            <i class="bi bi-tag me-1 text-muted"></i> Durum
+        </label>
+        <select asp-for="Durum" class="form-select"
+                asp-items="Html.GetEnumSelectList<GorevTakip.Models.GorevDurum>()">
+        </select>
+        <span asp-validation-for="Durum" class="text-danger small"></span>
+    </div>
+</div>

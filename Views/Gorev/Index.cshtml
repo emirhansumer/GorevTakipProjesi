@@ -1,0 +1,124 @@
+@model IEnumerable<Gorev>
+@{
+    var baslik = ViewBag.Baslik as string ?? "Görevlerim";
+    var filtre = ViewBag.Filtre as string ?? "tumu";
+    ViewData["Title"] = baslik;
+
+    var (emptyIcon, emptyText) = filtre switch
+    {
+        "bekleyen" => ("bi-hourglass", "Bekleyen görevin yok. Tebrikler!"),
+        "tamamlanan" => ("bi-emoji-smile", "Henüz tamamlanan görevin yok."),
+        _ => ("bi-clipboard-x", "Henüz görevin yok.")
+    };
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h2 class="mb-0">@baslik</h2>
+        <p class="text-muted mb-0 small">@Model.Count() görev</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Yeni Görev
+    </a>
+</div>
+
+<div class="mb-3">
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a class="nav-link @(filtre == "tumu" ? "active" : "")" asp-action="Index">
+                <i class="bi bi-list-ul me-1"></i> Tümü
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(filtre == "bekleyen" ? "active" : "")" asp-action="Bekleyen">
+                <i class="bi bi-hourglass-split me-1"></i> Bekleyen
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(filtre == "tamamlanan" ? "active" : "")" asp-action="Tamamlanan">
+                <i class="bi bi-check-circle me-1"></i> Tamamlanan
+            </a>
+        </li>
+    </ul>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card shadow-sm">
+        <div class="card-body empty-state">
+            <i class="bi @emptyIcon empty-icon"></i>
+            <p class="mb-2">@emptyText</p>
+            @if (filtre == "tumu")
+            {
+                <a asp-action="Create" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i> İlk görevini ekle
+                </a>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Görev</th>
+                        <th>Durum</th>
+                        <th>Bitiş</th>
+                        <th>Oluşturma</th>
+                        <th class="text-end">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var gorev in Model)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-action="Detail" asp-route-id="@gorev.Id" class="gorev-baslik-link fw-semibold">
+                                    @gorev.Baslik
+                                </a>
+                                @if (!string.IsNullOrWhiteSpace(gorev.Aciklama))
+                                {
+                                    <div class="text-muted small text-truncate" style="max-width:400px;">
+                                        @gorev.Aciklama
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge @gorev.Durum.CssClass()">@gorev.Durum.Etiket()</span>
+                            </td>
+                            <td>
+                                @if (gorev.BitisTarihi.HasValue)
+                                {
+                                    <span><i class="bi bi-calendar-event me-1 text-muted"></i>@gorev.BitisTarihi.Value.ToString("dd.MM.yyyy")</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+                            <td class="text-muted small">@gorev.OlusturmaTarihi.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td class="text-end">
+                                <a asp-action="Detail" asp-route-id="@gorev.Id" class="btn btn-sm btn-outline-secondary" title="Detay">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@gorev.Id" class="btn btn-sm btn-outline-primary" title="Düzenle">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@gorev.Id" method="post" class="d-inline"
+                                      onsubmit="return confirm('Bu görevi silmek istediğinden emin misin?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Sil">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
