@@ -23,4 +23,7 @@ public class GorevFormViewModel
 
     [Display(Name = "Durum")]
     public GorevDurum Durum { get; set; } = GorevDurum.Bekliyor;
+
+    [Display(Name = "Öncelik")]
+    public Oncelik Oncelik { get; set; } = Oncelik.Orta;
 }

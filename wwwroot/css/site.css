@@ -208,6 +208,31 @@ main {
     color: var(--gt-iptal) !important;
 }
 
+/* ===== Öncelik badge'leri ===== */
+.oncelik-badge {
+    font-weight: 600;
+}
+
+.oncelik-dusuk {
+    background-color: #e0f2fe !important;
+    color: #0369a1 !important;
+}
+
+.oncelik-orta {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+}
+
+.oncelik-yuksek {
+    background-color: #fef3c7 !important;
+    color: #b45309 !important;
+}
+
+.oncelik-acil {
+    background-color: #fee2e2 !important;
+    color: #b91c1c !important;
+}
+
 /* ===== Tables ===== */
 .table {
     --bs-table-hover-bg: rgba(99, 102, 241, 0.04);

@@ -21,7 +21,7 @@
 </div>
 
 <div class="row">
-    <div class="col-md-6 mb-3">
+    <div class="col-md-4 mb-3">
         <label asp-for="BitisTarihi" class="form-label">
             <i class="bi bi-calendar-event me-1 text-muted"></i> Bitiş Tarihi
         </label>
@@ -29,7 +29,7 @@
         <span asp-validation-for="BitisTarihi" class="text-danger small"></span>
     </div>
 
-    <div class="col-md-6 mb-3">
+    <div class="col-md-4 mb-3">
         <label asp-for="Durum" class="form-label">
             <i class="bi bi-tag me-1 text-muted"></i> Durum
         </label>
@@ -37,5 +37,15 @@
                 asp-items="Html.GetEnumSelectList<GorevTakip.Models.GorevDurum>()">
         </select>
         <span asp-validation-for="Durum" class="text-danger small"></span>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <label asp-for="Oncelik" class="form-label">
+            <i class="bi bi-flag me-1 text-muted"></i> Öncelik
+        </label>
+        <select asp-for="Oncelik" class="form-select"
+                asp-items="Html.GetEnumSelectList<GorevTakip.Models.Oncelik>()">
+        </select>
+        <span asp-validation-for="Oncelik" class="text-danger small"></span>
     </div>
 </div>

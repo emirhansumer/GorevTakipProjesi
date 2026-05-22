@@ -60,7 +60,11 @@ public class GorevController : Controller
         var sorgu = _db.Gorevler.Where(g => g.KullaniciId == AktifKullaniciId);
         if (durum.HasValue)
             sorgu = sorgu.Where(g => g.Durum == durum.Value);
-        return sorgu.OrderByDescending(g => g.OlusturmaTarihi).ToListAsync();
+        // Önce öncelik (yüksek üstte), sonra oluşturma tarihi (yeni üstte)
+        return sorgu
+            .OrderByDescending(g => g.Oncelik)
+            .ThenByDescending(g => g.OlusturmaTarihi)
+            .ToListAsync();
     }
 
     [HttpGet]
@@ -82,6 +86,7 @@ public class GorevController : Controller
             Aciklama = string.IsNullOrWhiteSpace(model.Aciklama) ? null : model.Aciklama.Trim(),
             BitisTarihi = model.BitisTarihi,
             Durum = model.Durum,
+            Oncelik = model.Oncelik,
             OlusturmaTarihi = DateTime.Now,
             KullaniciId = AktifKullaniciId
         };
@@ -108,7 +113,8 @@ public class GorevController : Controller
             Baslik = gorev.Baslik,
             Aciklama = gorev.Aciklama,
             BitisTarihi = gorev.BitisTarihi,
-            Durum = gorev.Durum
+            Durum = gorev.Durum,
+            Oncelik = gorev.Oncelik
         };
 
         return View(model);
@@ -134,6 +140,7 @@ public class GorevController : Controller
         gorev.Aciklama = string.IsNullOrWhiteSpace(model.Aciklama) ? null : model.Aciklama.Trim();
         gorev.BitisTarihi = model.BitisTarihi;
         gorev.Durum = model.Durum;
+        gorev.Oncelik = model.Oncelik;
 
         await _db.SaveChangesAsync();
 
