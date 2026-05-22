@@ -20,11 +20,25 @@ public class GorevController : Controller
 
     private int AktifKullaniciId => HttpContext.Session.GetKullaniciId()!.Value;
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int? kategoriId = null)
     {
-        ViewBag.Baslik = "Tüm Görevlerim";
         ViewBag.Filtre = "tumu";
-        var gorevler = await GorevleriGetir(null);
+        ViewBag.Baslik = "Tüm Görevlerim";
+        ViewBag.SeciliKategoriId = kategoriId;
+
+        if (kategoriId.HasValue)
+        {
+            var kategori = await _db.Kategoriler
+                .FirstOrDefaultAsync(k => k.Id == kategoriId && k.KullaniciId == AktifKullaniciId);
+            if (kategori is not null)
+            {
+                ViewBag.Baslik = $"{kategori.Ad} kategorisindeki görevler";
+                ViewBag.SeciliKategoriRenk = kategori.Renk;
+            }
+        }
+
+        await KategoriListesiniDoldur();
+        var gorevler = await GorevleriGetir(null, kategoriId);
         return View(gorevler);
     }
 
@@ -32,7 +46,8 @@ public class GorevController : Controller
     {
         ViewBag.Baslik = "Tamamlanan Görevler";
         ViewBag.Filtre = "tamamlanan";
-        var gorevler = await GorevleriGetir(GorevDurum.Tamamlandi);
+        await KategoriListesiniDoldur();
+        var gorevler = await GorevleriGetir(GorevDurum.Tamamlandi, null);
         return View("Index", gorevler);
     }
 
@@ -40,13 +55,15 @@ public class GorevController : Controller
     {
         ViewBag.Baslik = "Bekleyen Görevler";
         ViewBag.Filtre = "bekleyen";
-        var gorevler = await GorevleriGetir(GorevDurum.Bekliyor);
+        await KategoriListesiniDoldur();
+        var gorevler = await GorevleriGetir(GorevDurum.Bekliyor, null);
         return View("Index", gorevler);
     }
 
     public async Task<IActionResult> Detail(int id)
     {
         var gorev = await _db.Gorevler
+            .Include(g => g.Kategori)
             .FirstOrDefaultAsync(g => g.Id == id && g.KullaniciId == AktifKullaniciId);
 
         if (gorev is null)
@@ -55,30 +72,53 @@ public class GorevController : Controller
         return View(gorev);
     }
 
-    private Task<List<Gorev>> GorevleriGetir(GorevDurum? durum)
+    private Task<List<Gorev>> GorevleriGetir(GorevDurum? durum, int? kategoriId)
     {
-        var sorgu = _db.Gorevler.Where(g => g.KullaniciId == AktifKullaniciId);
+        var sorgu = _db.Gorevler
+            .Include(g => g.Kategori)
+            .Where(g => g.KullaniciId == AktifKullaniciId);
+
         if (durum.HasValue)
             sorgu = sorgu.Where(g => g.Durum == durum.Value);
-        // Önce öncelik (yüksek üstte), sonra oluşturma tarihi (yeni üstte)
+        if (kategoriId.HasValue)
+            sorgu = sorgu.Where(g => g.KategoriId == kategoriId.Value);
+
         return sorgu
             .OrderByDescending(g => g.Oncelik)
             .ThenByDescending(g => g.OlusturmaTarihi)
             .ToListAsync();
     }
 
-    [HttpGet]
-    public IActionResult Create()
+    private async Task KategoriListesiniDoldur()
     {
-        return View(new GorevFormViewModel());
+        ViewBag.Kategoriler = await _db.Kategoriler
+            .Where(k => k.KullaniciId == AktifKullaniciId)
+            .OrderBy(k => k.Ad)
+            .ToListAsync();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Create()
+    {
+        var model = new GorevFormViewModel
+        {
+            KullaniciKategorileri = await KullaniciKategorileri()
+        };
+        return View(model);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(GorevFormViewModel model)
     {
+        if (!await KategoriGecerliMi(model.KategoriId))
+            ModelState.AddModelError(nameof(model.KategoriId), "Geçersiz kategori.");
+
         if (!ModelState.IsValid)
+        {
+            model.KullaniciKategorileri = await KullaniciKategorileri();
             return View(model);
+        }
 
         var gorev = new Gorev
         {
@@ -87,6 +127,7 @@ public class GorevController : Controller
             BitisTarihi = model.BitisTarihi,
             Durum = model.Durum,
             Oncelik = model.Oncelik,
+            KategoriId = model.KategoriId,
             OlusturmaTarihi = DateTime.Now,
             KullaniciId = AktifKullaniciId
         };
@@ -114,7 +155,9 @@ public class GorevController : Controller
             Aciklama = gorev.Aciklama,
             BitisTarihi = gorev.BitisTarihi,
             Durum = gorev.Durum,
-            Oncelik = gorev.Oncelik
+            Oncelik = gorev.Oncelik,
+            KategoriId = gorev.KategoriId,
+            KullaniciKategorileri = await KullaniciKategorileri()
         };
 
         return View(model);
@@ -127,8 +170,14 @@ public class GorevController : Controller
         if (id != model.Id)
             return BadRequest();
 
+        if (!await KategoriGecerliMi(model.KategoriId))
+            ModelState.AddModelError(nameof(model.KategoriId), "Geçersiz kategori.");
+
         if (!ModelState.IsValid)
+        {
+            model.KullaniciKategorileri = await KullaniciKategorileri();
             return View(model);
+        }
 
         var gorev = await _db.Gorevler
             .FirstOrDefaultAsync(g => g.Id == id && g.KullaniciId == AktifKullaniciId);
@@ -141,6 +190,7 @@ public class GorevController : Controller
         gorev.BitisTarihi = model.BitisTarihi;
         gorev.Durum = model.Durum;
         gorev.Oncelik = model.Oncelik;
+        gorev.KategoriId = model.KategoriId;
 
         await _db.SaveChangesAsync();
 
@@ -163,5 +213,20 @@ public class GorevController : Controller
 
         TempData["Basari"] = "Görev silindi.";
         return RedirectToAction(nameof(Index));
+    }
+
+    // --- yardımcı metotlar ---
+
+    private Task<List<Kategori>> KullaniciKategorileri() =>
+        _db.Kategoriler
+            .Where(k => k.KullaniciId == AktifKullaniciId)
+            .OrderBy(k => k.Ad)
+            .ToListAsync();
+
+    private async Task<bool> KategoriGecerliMi(int? kategoriId)
+    {
+        if (!kategoriId.HasValue) return true;
+        return await _db.Kategoriler
+            .AnyAsync(k => k.Id == kategoriId.Value && k.KullaniciId == AktifKullaniciId);
     }
 }

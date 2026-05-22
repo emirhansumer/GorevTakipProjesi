@@ -31,4 +31,10 @@ public class Gorev
     public int KullaniciId { get; set; }
 
     public Kullanici? Kullanici { get; set; }
+
+    [Display(Name = "Kategori")]
+    [ForeignKey(nameof(Kategori))]
+    public int? KategoriId { get; set; }
+
+    public Kategori? Kategori { get; set; }
 }

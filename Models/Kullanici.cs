@@ -21,4 +21,5 @@ public class Kullanici
     public DateTime KayitTarihi { get; set; } = DateTime.Now;
 
     public ICollection<Gorev> Gorevler { get; set; } = new List<Gorev>();
+    public ICollection<Kategori> Kategoriler { get; set; } = new List<Kategori>();
 }

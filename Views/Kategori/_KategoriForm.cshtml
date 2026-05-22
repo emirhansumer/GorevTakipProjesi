@@ -1,0 +1,27 @@
+@model KategoriFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+<input asp-for="Id" type="hidden" />
+
+<div class="mb-3">
+    <label asp-for="Ad" class="form-label">
+        <i class="bi bi-tag me-1 text-muted"></i> Kategori Adı
+    </label>
+    <input asp-for="Ad" class="form-control" autofocus placeholder="Örn: Okul, İş, Kişisel..." />
+    <span asp-validation-for="Ad" class="text-danger small"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Renk" class="form-label">
+        <i class="bi bi-palette me-1 text-muted"></i> Renk
+    </label>
+    <div class="d-flex align-items-center gap-2">
+        <input asp-for="Renk" type="color" class="form-control form-control-color"
+               style="width:80px; height:42px;"
+               oninput="document.getElementById('renkHex').textContent = this.value;" />
+        <span id="renkHex" class="font-monospace text-muted">@Model.Renk</span>
+        <span class="text-muted small ms-auto">Görev listesinde bu renk gösterilecek</span>
+    </div>
+    <span asp-validation-for="Renk" class="text-danger small"></span>
+</div>
