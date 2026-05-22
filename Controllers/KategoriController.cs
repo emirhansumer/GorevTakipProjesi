@@ -70,6 +70,7 @@ public class KategoriController : Controller
         {
             Ad = model.Ad.Trim(),
             Renk = model.Renk,
+            Ikon = string.IsNullOrWhiteSpace(model.Ikon) ? "bi-bookmark" : model.Ikon,
             KullaniciId = AktifKullaniciId,
             OlusturmaTarihi = DateTime.Now
         };
@@ -94,7 +95,8 @@ public class KategoriController : Controller
         {
             Id = kategori.Id,
             Ad = kategori.Ad,
-            Renk = kategori.Renk
+            Renk = kategori.Renk,
+            Ikon = string.IsNullOrWhiteSpace(kategori.Ikon) ? "bi-bookmark" : kategori.Ikon
         });
     }
 
@@ -122,6 +124,7 @@ public class KategoriController : Controller
 
         kategori.Ad = model.Ad.Trim();
         kategori.Renk = model.Renk;
+        kategori.Ikon = string.IsNullOrWhiteSpace(model.Ikon) ? "bi-bookmark" : model.Ikon;
         await _db.SaveChangesAsync();
 
         TempData["Basari"] = "Kategori güncellendi.";
@@ -153,6 +156,7 @@ public class KategoriController : Controller
         {
             Ad = ad,
             Renk = model.Renk,
+            Ikon = string.IsNullOrWhiteSpace(model.Ikon) ? "bi-bookmark" : model.Ikon,
             KullaniciId = AktifKullaniciId,
             OlusturmaTarihi = DateTime.Now
         };
@@ -160,7 +164,7 @@ public class KategoriController : Controller
         _db.Kategoriler.Add(kategori);
         await _db.SaveChangesAsync();
 
-        return Json(new { ok = true, id = kategori.Id, ad = kategori.Ad, renk = kategori.Renk });
+        return Json(new { ok = true, id = kategori.Id, ad = kategori.Ad, renk = kategori.Renk, ikon = kategori.Ikon });
     }
 
     [HttpPost]

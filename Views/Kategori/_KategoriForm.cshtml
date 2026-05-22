@@ -3,16 +3,16 @@
 @{
     var renkler = new[]
     {
-        "#6366f1", // indigo
-        "#ec4899", // pembe
-        "#10b981", // yeşil
-        "#f59e0b", // amber
-        "#ef4444", // kırmızı
-        "#06b6d4", // cyan
-        "#8b5cf6", // mor
-        "#f97316", // turuncu
-        "#14b8a6", // teal
-        "#64748b"  // gri
+        "#6366f1", "#ec4899", "#10b981", "#f59e0b", "#ef4444",
+        "#06b6d4", "#8b5cf6", "#f97316", "#14b8a6", "#64748b"
+    };
+
+    var ikonlar = new[]
+    {
+        "bi-bookmark", "bi-book", "bi-briefcase", "bi-house",
+        "bi-heart", "bi-cart", "bi-cup-hot", "bi-airplane",
+        "bi-controller", "bi-music-note", "bi-camera", "bi-code-slash",
+        "bi-lightbulb", "bi-flag", "bi-star", "bi-gem"
     };
 }
 
@@ -41,8 +41,7 @@
                     class="renk-secenek @(aktif ? "aktif" : "")"
                     data-renk="@renk"
                     style="background:@renk;"
-                    title="@renk"
-                    aria-label="@renk rengi seç">
+                    title="@renk">
                 @if (aktif)
                 {
                     <i class="bi bi-check-lg"></i>
@@ -58,41 +57,65 @@
     <span asp-validation-for="Renk" class="text-danger small d-block mt-1"></span>
 </div>
 
+<div class="mb-3">
+    <label class="form-label">
+        <i class="bi bi-emoji-smile me-1 text-muted"></i> İkon
+    </label>
+    <input asp-for="Ikon" type="hidden" id="ikonInput" />
+    <div class="ikon-paleti d-flex flex-wrap gap-2">
+        @foreach (var ikon in ikonlar)
+        {
+            var aktif = string.Equals(Model.Ikon, ikon, StringComparison.OrdinalIgnoreCase);
+            <button type="button"
+                    class="ikon-secenek @(aktif ? "aktif" : "")"
+                    data-ikon="@ikon"
+                    title="@ikon">
+                <i class="bi @ikon"></i>
+            </button>
+        }
+    </div>
+    <span asp-validation-for="Ikon" class="text-danger small d-block mt-1"></span>
+</div>
+
 <script>
     (function () {
-        var input = document.getElementById('renkInput');
+        // Renk paleti
+        var renkInput = document.getElementById('renkInput');
         var hexLabel = document.getElementById('renkHex');
         var ozelRenk = document.getElementById('ozelRenk');
-        var butonlar = document.querySelectorAll('.renk-secenek[data-renk]');
+        var renkBtns = document.querySelectorAll('.renk-secenek[data-renk]');
 
         function setRenk(renk) {
-            input.value = renk;
+            renkInput.value = renk;
             hexLabel.textContent = renk;
             ozelRenk.value = renk;
-            butonlar.forEach(function (b) {
-                if (b.dataset.renk && b.dataset.renk.toLowerCase() === renk.toLowerCase()) {
-                    b.classList.add('aktif');
-                    if (!b.querySelector('i')) {
-                        var i = document.createElement('i');
-                        i.className = 'bi bi-check-lg';
-                        b.appendChild(i);
-                    }
-                } else {
-                    b.classList.remove('aktif');
-                    var icon = b.querySelector('i');
-                    if (icon) b.removeChild(icon);
+            renkBtns.forEach(function (b) {
+                var match = b.dataset.renk && b.dataset.renk.toLowerCase() === renk.toLowerCase();
+                b.classList.toggle('aktif', match);
+                var ic = b.querySelector('i');
+                if (match && !ic) {
+                    var i = document.createElement('i');
+                    i.className = 'bi bi-check-lg';
+                    b.appendChild(i);
+                } else if (!match && ic) {
+                    b.removeChild(ic);
                 }
             });
         }
-
-        butonlar.forEach(function (b) {
-            b.addEventListener('click', function () {
-                setRenk(b.dataset.renk);
-            });
+        renkBtns.forEach(function (b) {
+            b.addEventListener('click', function () { setRenk(b.dataset.renk); });
         });
+        ozelRenk.addEventListener('input', function () { setRenk(ozelRenk.value); });
 
-        ozelRenk.addEventListener('input', function () {
-            setRenk(ozelRenk.value);
+        // İkon paleti
+        var ikonInput = document.getElementById('ikonInput');
+        var ikonBtns = document.querySelectorAll('.ikon-secenek');
+        ikonBtns.forEach(function (b) {
+            b.addEventListener('click', function () {
+                ikonInput.value = b.dataset.ikon;
+                ikonBtns.forEach(function (x) { x.classList.remove('aktif'); });
+                b.classList.add('aktif');
+            });
         });
     })();
 </script>

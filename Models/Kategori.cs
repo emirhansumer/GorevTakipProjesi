@@ -18,6 +18,11 @@ public class Kategori
     [Display(Name = "Renk")]
     public string Renk { get; set; } = "#6366f1";
 
+    // Bootstrap Icons sınıf adı (örn: "bi-bookmark"). Boş bırakılırsa default ikon kullanılır.
+    [StringLength(50)]
+    [Display(Name = "İkon")]
+    public string Ikon { get; set; } = "bi-bookmark";
+
     public DateTime OlusturmaTarihi { get; set; } = DateTime.Now;
 
     [ForeignKey(nameof(Kullanici))]

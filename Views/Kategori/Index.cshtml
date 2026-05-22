@@ -35,7 +35,9 @@ else
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
-                            <span class="kategori-dot" style="background:@kategori.Renk;"></span>
+                            <span class="kategori-ikon-yuvarlak" style="background:@kategori.Renk;">
+                                <i class="bi @(string.IsNullOrWhiteSpace(kategori.Ikon) ? "bi-bookmark" : kategori.Ikon)"></i>
+                            </span>
                             <h5 class="mb-0 ms-2 flex-grow-1">@kategori.Ad</h5>
                         </div>
 

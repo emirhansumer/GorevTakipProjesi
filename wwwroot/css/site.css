@@ -253,6 +253,22 @@ main {
     box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 }
 
+.kategori-ikon-yuvarlak {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: white;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.kategori-chip i.bi {
+    font-size: 0.85em;
+}
+
 /* Renk paleti (kategori form) */
 .renk-paleti {
     padding: 0.5rem;
@@ -302,6 +318,42 @@ main {
     cursor: pointer;
     border: none;
     padding: 0;
+}
+
+/* İkon paleti */
+.ikon-paleti {
+    padding: 0.5rem;
+    background: var(--gt-bg);
+    border-radius: 10px;
+    border: 1px solid var(--gt-border);
+}
+
+.ikon-secenek {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background: white;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gt-text);
+    font-size: 1.1rem;
+    transition: transform 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.ikon-secenek:hover {
+    transform: scale(1.08);
+    border-color: var(--gt-primary-light);
+    color: var(--gt-primary);
+}
+
+.ikon-secenek.aktif {
+    background-color: var(--gt-primary);
+    color: white;
+    border-color: var(--gt-primary-dark);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
 }
 
 /* ===== Öncelik badge'leri ===== */
