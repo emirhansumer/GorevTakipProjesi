@@ -30,7 +30,8 @@ public class KategoriController : Controller
                 Toplam = k.Gorevler.Count,
                 Tamamlanan = k.Gorevler.Count(g => g.Durum == GorevDurum.Tamamlandi)
             })
-            .OrderBy(x => x.Kategori.Ad)
+            .OrderBy(x => x.Kategori.Sira)
+            .ThenBy(x => x.Kategori.Ad)
             .ToListAsync();
 
         return View(liste);
@@ -72,7 +73,8 @@ public class KategoriController : Controller
             Renk = model.Renk,
             Ikon = string.IsNullOrWhiteSpace(model.Ikon) ? "bi-bookmark" : model.Ikon,
             KullaniciId = AktifKullaniciId,
-            OlusturmaTarihi = DateTime.Now
+            OlusturmaTarihi = DateTime.Now,
+            Sira = await SonrakiSiraNumarasi()
         };
 
         _db.Kategoriler.Add(kategori);
@@ -80,6 +82,15 @@ public class KategoriController : Controller
 
         TempData["Basari"] = "Kategori eklendi.";
         return RedirectToAction(nameof(Index));
+    }
+
+    private async Task<int> SonrakiSiraNumarasi()
+    {
+        var maks = await _db.Kategoriler
+            .Where(k => k.KullaniciId == AktifKullaniciId)
+            .Select(k => (int?)k.Sira)
+            .MaxAsync();
+        return (maks ?? 0) + 1;
     }
 
     [HttpGet]
@@ -158,13 +169,39 @@ public class KategoriController : Controller
             Renk = model.Renk,
             Ikon = string.IsNullOrWhiteSpace(model.Ikon) ? "bi-bookmark" : model.Ikon,
             KullaniciId = AktifKullaniciId,
-            OlusturmaTarihi = DateTime.Now
+            OlusturmaTarihi = DateTime.Now,
+            Sira = await SonrakiSiraNumarasi()
         };
 
         _db.Kategoriler.Add(kategori);
         await _db.SaveChangesAsync();
 
         return Json(new { ok = true, id = kategori.Id, ad = kategori.Ad, renk = kategori.Renk, ikon = kategori.Ikon });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SiralamaGuncelle([FromForm] int[] siraliIdler)
+    {
+        if (siraliIdler is null || siraliIdler.Length == 0)
+            return BadRequest(new { ok = false, message = "Boş liste." });
+
+        var kategoriler = await _db.Kategoriler
+            .Where(k => k.KullaniciId == AktifKullaniciId && siraliIdler.Contains(k.Id))
+            .ToListAsync();
+
+        // Güvenlik: gelen tüm id'lerin gerçekten bu kullanıcıya ait olduğunu doğrula
+        if (kategoriler.Count != siraliIdler.Length)
+            return BadRequest(new { ok = false, message = "Bazı kategoriler size ait değil." });
+
+        for (int i = 0; i < siraliIdler.Length; i++)
+        {
+            var k = kategoriler.First(x => x.Id == siraliIdler[i]);
+            k.Sira = i + 1;
+        }
+        await _db.SaveChangesAsync();
+
+        return Json(new { ok = true, count = siraliIdler.Length });
     }
 
     [HttpPost]

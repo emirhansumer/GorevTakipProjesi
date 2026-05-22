@@ -23,6 +23,9 @@ public class Kategori
     [Display(Name = "İkon")]
     public string Ikon { get; set; } = "bi-bookmark";
 
+    // Kullanıcının kategorilerini sıralamak için. Küçük değer önce gösterilir.
+    public int Sira { get; set; }
+
     public DateTime OlusturmaTarihi { get; set; } = DateTime.Now;
 
     [ForeignKey(nameof(Kullanici))]
