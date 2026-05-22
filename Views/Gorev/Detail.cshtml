@@ -70,12 +70,12 @@
                     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
                         <i class="bi bi-pencil me-1"></i> Düzenle
                     </a>
-                    <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline"
-                          onsubmit="return confirm('Bu görevi silmek istediğinden emin misin?');">
+                    <button type="button" class="btn btn-outline-danger"
+                            onclick="GorevTakip.silOnayi('sil-form-detay', { text: '@Html.Raw(Html.Encode(Model.Baslik)) görevi silinecek. Emin misin?' })">
+                        <i class="bi bi-trash me-1"></i> Sil
+                    </button>
+                    <form id="sil-form-detay" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-none">
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-outline-danger">
-                            <i class="bi bi-trash me-1"></i> Sil
-                        </button>
                     </form>
                 </div>
             </div>
