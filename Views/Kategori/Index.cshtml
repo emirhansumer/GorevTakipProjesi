@@ -1,0 +1,62 @@
+@model IEnumerable<Kategori>
+@{
+    ViewData["Title"] = "Kategorilerim";
+    var gorevSayilari = ViewBag.GorevSayilari as Dictionary<int, int> ?? new();
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h2 class="mb-0">Kategorilerim</h2>
+        <p class="text-muted mb-0 small">@Model.Count() kategori</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Yeni Kategori
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card shadow-sm">
+        <div class="card-body empty-state">
+            <i class="bi bi-bookmarks empty-icon"></i>
+            <p class="mb-2">Henüz kategori oluşturmadın.</p>
+            <a asp-action="Create" class="btn btn-sm btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> İlk kategorini ekle
+            </a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var kategori in Model)
+        {
+            var sayi = gorevSayilari.GetValueOrDefault(kategori.Id, 0);
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="kategori-dot" style="background:@kategori.Renk;"></span>
+                            <h5 class="mb-0 ms-2">@kategori.Ad</h5>
+                        </div>
+                        <div class="text-muted small mb-3">
+                            <i class="bi bi-list-check me-1"></i> @sayi görev
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Edit" asp-route-id="@kategori.Id" class="btn btn-sm btn-outline-primary flex-fill">
+                                <i class="bi bi-pencil me-1"></i> Düzenle
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                    onclick="GorevTakip.silOnayi('kategori-sil-@kategori.Id', { text: '@Html.Raw(Html.Encode(kategori.Ad)) kategorisi silinecek. Bu kategorideki görevler kategorisiz hale gelecek.' })">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            <form id="kategori-sil-@kategori.Id" asp-action="Delete" asp-route-id="@kategori.Id" method="post" class="d-none">
+                                @Html.AntiForgeryToken()
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

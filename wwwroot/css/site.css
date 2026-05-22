@@ -208,6 +208,35 @@ main {
     color: var(--gt-iptal) !important;
 }
 
+/* ===== Kategori ===== */
+.kategori-dot {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.kategori-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1;
+    color: white;
+    white-space: nowrap;
+}
+
+.kategori-chip-bos {
+    background: var(--gt-iptal-bg);
+    color: var(--gt-text-muted);
+    font-style: italic;
+}
+
 /* ===== Öncelik badge'leri ===== */
 .oncelik-badge {
     font-weight: 600;

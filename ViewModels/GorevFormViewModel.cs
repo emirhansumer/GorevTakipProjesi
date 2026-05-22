@@ -26,4 +26,10 @@ public class GorevFormViewModel
 
     [Display(Name = "Öncelik")]
     public Oncelik Oncelik { get; set; } = Oncelik.Orta;
+
+    [Display(Name = "Kategori")]
+    public int? KategoriId { get; set; }
+
+    // Dropdown için doldurulacak — submit'te boş gelir, GET'te controller doldurur
+    public IEnumerable<Kategori>? KullaniciKategorileri { get; set; }
 }

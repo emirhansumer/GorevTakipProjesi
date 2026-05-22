@@ -24,6 +24,7 @@ public class HomeController : Controller
         var kullaniciId = HttpContext.Session.GetKullaniciId()!.Value;
 
         var gorevler = await _db.Gorevler
+            .Include(g => g.Kategori)
             .Where(g => g.KullaniciId == kullaniciId)
             .ToListAsync();
 

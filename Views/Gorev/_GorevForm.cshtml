@@ -49,3 +49,27 @@
         <span asp-validation-for="Oncelik" class="text-danger small"></span>
     </div>
 </div>
+
+<div class="mb-3">
+    <label asp-for="KategoriId" class="form-label">
+        <i class="bi bi-bookmark me-1 text-muted"></i> Kategori
+    </label>
+    <select asp-for="KategoriId" class="form-select">
+        <option value="">— Kategorisiz —</option>
+        @if (Model.KullaniciKategorileri is not null)
+        {
+            foreach (var kategori in Model.KullaniciKategorileri)
+            {
+                <option value="@kategori.Id" data-renk="@kategori.Renk">@kategori.Ad</option>
+            }
+        }
+    </select>
+    <span asp-validation-for="KategoriId" class="text-danger small"></span>
+    @if (Model.KullaniciKategorileri is null || !Model.KullaniciKategorileri.Any())
+    {
+        <small class="text-muted">
+            <i class="bi bi-info-circle me-1"></i>
+            Henüz kategorin yok. <a asp-controller="Kategori" asp-action="Create">Kategori ekle</a>
+        </small>
+    }
+</div>

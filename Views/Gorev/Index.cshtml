@@ -2,6 +2,8 @@
 @{
     var baslik = ViewBag.Baslik as string ?? "Görevlerim";
     var filtre = ViewBag.Filtre as string ?? "tumu";
+    var kategoriler = ViewBag.Kategoriler as List<Kategori> ?? new List<Kategori>();
+    var seciliKategoriId = ViewBag.SeciliKategoriId as int?;
     ViewData["Title"] = baslik;
 
     var (emptyIcon, emptyText) = filtre switch
@@ -22,10 +24,10 @@
     </a>
 </div>
 
-<div class="mb-3">
+<div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
     <ul class="nav nav-pills">
         <li class="nav-item">
-            <a class="nav-link @(filtre == "tumu" ? "active" : "")" asp-action="Index">
+            <a class="nav-link @(filtre == "tumu" && !seciliKategoriId.HasValue ? "active" : "")" asp-action="Index">
                 <i class="bi bi-list-ul me-1"></i> Tümü
             </a>
         </li>
@@ -40,6 +42,25 @@
             </a>
         </li>
     </ul>
+
+    @if (kategoriler.Any() && filtre == "tumu")
+    {
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <span class="text-muted small">Kategori:</span>
+            <div class="d-flex flex-wrap gap-1">
+                @foreach (var kat in kategoriler)
+                {
+                    var aktif = seciliKategoriId == kat.Id;
+                    <a asp-action="Index" asp-route-kategoriId="@kat.Id"
+                       class="kategori-chip text-decoration-none @(aktif ? "" : "opacity-75")"
+                       style="background:@kat.Renk;">
+                        <span class="kategori-dot" style="background:white; width:8px; height:8px; border:none;"></span>
+                        @kat.Ad
+                    </a>
+                }
+            </div>
+        </div>
+    }
 </div>
 
 @if (!Model.Any())
@@ -65,6 +86,7 @@ else
                 <thead>
                     <tr>
                         <th>Görev</th>
+                        <th>Kategori</th>
                         <th>Öncelik</th>
                         <th>Durum</th>
                         <th>Bitiş</th>
@@ -85,6 +107,16 @@ else
                                     <div class="text-muted small text-truncate" style="max-width:400px;">
                                         @gorev.Aciklama
                                     </div>
+                                }
+                            </td>
+                            <td>
+                                @if (gorev.Kategori is not null)
+                                {
+                                    <span class="kategori-chip" style="background:@gorev.Kategori.Renk;">@gorev.Kategori.Ad</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">—</span>
                                 }
                             </td>
                             <td>
