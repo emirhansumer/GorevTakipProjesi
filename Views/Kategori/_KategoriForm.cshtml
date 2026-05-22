@@ -7,12 +7,28 @@
         "#06b6d4", "#8b5cf6", "#f97316", "#14b8a6", "#64748b"
     };
 
-    var ikonlar = new[]
+    var ikonlar = new (string Ad, string Etiket)[]
     {
-        "bi-bookmark", "bi-book", "bi-briefcase", "bi-house",
-        "bi-heart", "bi-cart", "bi-cup-hot", "bi-airplane",
-        "bi-controller", "bi-music-note", "bi-camera", "bi-code-slash",
-        "bi-lightbulb", "bi-flag", "bi-star", "bi-gem"
+        ("bi-bookmark",     "Genel"),
+        ("bi-book",         "Okul / Kitap"),
+        ("bi-briefcase",    "İş"),
+        ("bi-house",        "Ev / Kişisel"),
+        ("bi-heart",        "Sağlık"),
+        ("bi-cart",         "Alışveriş"),
+        ("bi-cup-hot",      "Kahve / Mola"),
+        ("bi-airplane",     "Seyahat"),
+        ("bi-controller",   "Oyun"),
+        ("bi-music-note",   "Müzik"),
+        ("bi-camera",       "Fotoğraf"),
+        ("bi-code-slash",   "Kod / Yazılım"),
+        ("bi-lightbulb",    "Fikir"),
+        ("bi-flag",         "Hedef"),
+        ("bi-star",         "Favori"),
+        ("bi-gem",          "Önemli"),
+        ("bi-trophy",       "Spor / Başarı"),
+        ("bi-bicycle",      "Bisiklet"),
+        ("bi-heart-pulse",  "Egzersiz"),
+        ("bi-pencil",       "Çalışma / Not")
     };
 }
 
@@ -65,12 +81,13 @@
     <div class="ikon-paleti d-flex flex-wrap gap-2">
         @foreach (var ikon in ikonlar)
         {
-            var aktif = string.Equals(Model.Ikon, ikon, StringComparison.OrdinalIgnoreCase);
+            var aktif = string.Equals(Model.Ikon, ikon.Ad, StringComparison.OrdinalIgnoreCase);
             <button type="button"
                     class="ikon-secenek @(aktif ? "aktif" : "")"
-                    data-ikon="@ikon"
-                    title="@ikon">
-                <i class="bi @ikon"></i>
+                    data-ikon="@ikon.Ad"
+                    title="@ikon.Etiket"
+                    aria-label="@ikon.Etiket">
+                <i class="bi @ikon.Ad"></i>
             </button>
         }
     </div>

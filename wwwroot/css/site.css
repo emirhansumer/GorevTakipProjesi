@@ -226,9 +226,33 @@ main {
     border-radius: 999px;
     font-size: 0.78rem;
     font-weight: 600;
-    line-height: 1;
+    line-height: 1.4;
     color: white;
     white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Kategori sütununda chip sıkıştığında bozulmasın */
+.kategori-chip-btn {
+    max-width: 100%;
+    display: inline-block;
+    text-align: left;
+    overflow: hidden;
+}
+
+/* Görev tablosunda kategori sütunu için sabit genişlik */
+.tablo-kategori-sutun {
+    width: 200px;
+    max-width: 200px;
+}
+
+@media (max-width: 768px) {
+    .tablo-kategori-sutun {
+        width: 140px;
+        max-width: 140px;
+    }
 }
 
 .kategori-chip-bos {
