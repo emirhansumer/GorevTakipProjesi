@@ -100,7 +100,7 @@ public class GorevController : Controller
     {
         ViewBag.Kategoriler = await _db.Kategoriler
             .Where(k => k.KullaniciId == AktifKullaniciId)
-            .OrderBy(k => k.Ad)
+            .OrderBy(k => k.Sira).ThenBy(k => k.Ad)
             .ToListAsync();
     }
 
@@ -250,7 +250,7 @@ public class GorevController : Controller
     private Task<List<Kategori>> KullaniciKategorileri() =>
         _db.Kategoriler
             .Where(k => k.KullaniciId == AktifKullaniciId)
-            .OrderBy(k => k.Ad)
+            .OrderBy(k => k.Sira).ThenBy(k => k.Ad)
             .ToListAsync();
 
     private async Task<bool> KategoriGecerliMi(int? kategoriId)

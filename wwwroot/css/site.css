@@ -289,6 +289,36 @@ main {
     flex-shrink: 0;
 }
 
+/* Drag-drop kategori sıralama */
+.kategori-surukle-tut {
+    background: none;
+    border: none;
+    color: var(--gt-text-muted);
+    cursor: grab;
+    padding: 0 0.4rem 0 0;
+    font-size: 1.2rem;
+    line-height: 1;
+    transition: color 0.12s ease;
+}
+
+.kategori-surukle-tut:hover {
+    color: var(--gt-primary);
+}
+
+.kategori-surukle-tut:active {
+    cursor: grabbing;
+}
+
+.kategori-kart-ghost {
+    opacity: 0.4;
+}
+
+.kategori-kart-chosen .card {
+    box-shadow: 0 12px 30px rgba(99, 102, 241, 0.25);
+    border-color: var(--gt-primary);
+    transform: rotate(1deg);
+}
+
 .kategori-chip i.bi {
     font-size: 0.85em;
 }
