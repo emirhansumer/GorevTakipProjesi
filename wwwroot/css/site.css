@@ -237,6 +237,57 @@ main {
     font-style: italic;
 }
 
+/* Renk paleti (kategori form) */
+.renk-paleti {
+    padding: 0.5rem;
+    background: var(--gt-bg);
+    border-radius: 10px;
+    border: 1px solid var(--gt-border);
+}
+
+.renk-secenek {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+    position: relative;
+}
+
+.renk-secenek:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+.renk-secenek.aktif {
+    border-color: var(--gt-text);
+    box-shadow: 0 0 0 2px white, 0 0 0 4px var(--gt-text);
+}
+
+.renk-ozel {
+    background: linear-gradient(135deg, #f43f5e, #f59e0b, #10b981, #06b6d4, #6366f1, #ec4899);
+    border: 2px dashed white;
+    box-shadow: 0 0 0 1px var(--gt-border);
+}
+
+.renk-ozel input[type="color"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+}
+
 /* ===== Öncelik badge'leri ===== */
 .oncelik-badge {
     font-weight: 600;
