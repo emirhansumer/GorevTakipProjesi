@@ -237,6 +237,22 @@ main {
     font-style: italic;
 }
 
+.kategori-chip-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.kategori-chip-btn:hover {
+    transform: scale(1.05);
+}
+
+.kategori-chip-btn:hover .kategori-chip {
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+}
+
 /* Renk paleti (kategori form) */
 .renk-paleti {
     padding: 0.5rem;

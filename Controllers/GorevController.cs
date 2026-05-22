@@ -207,6 +207,29 @@ public class GorevController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    public async Task<IActionResult> KategoriDegistir([FromForm] int gorevId, [FromForm] int? kategoriId)
+    {
+        var gorev = await _db.Gorevler
+            .FirstOrDefaultAsync(g => g.Id == gorevId && g.KullaniciId == AktifKullaniciId);
+        if (gorev is null)
+            return NotFound(new { ok = false, message = "Görev bulunamadı." });
+
+        if (!await KategoriGecerliMi(kategoriId))
+            return BadRequest(new { ok = false, message = "Geçersiz kategori." });
+
+        gorev.KategoriId = kategoriId;
+        await _db.SaveChangesAsync();
+
+        if (kategoriId.HasValue)
+        {
+            var kat = await _db.Kategoriler.FirstAsync(k => k.Id == kategoriId.Value);
+            return Json(new { ok = true, kategoriId = kat.Id, ad = kat.Ad, renk = kat.Renk });
+        }
+        return Json(new { ok = true, kategoriId = (int?)null, ad = (string?)null, renk = (string?)null });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
         var gorev = await _db.Gorevler

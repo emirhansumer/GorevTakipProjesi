@@ -116,14 +116,24 @@ else
                                 }
                             </td>
                             <td>
-                                @if (gorev.Kategori is not null)
-                                {
-                                    <span class="kategori-chip" style="background:@gorev.Kategori.Renk;">@gorev.Kategori.Ad</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted small">—</span>
-                                }
+                                <button type="button"
+                                        class="kategori-chip-btn"
+                                        data-gorev-id="@gorev.Id"
+                                        data-mevcut-kategori-id="@(gorev.KategoriId?.ToString() ?? "")"
+                                        title="Kategoriyi değiştir">
+                                    @if (gorev.Kategori is not null)
+                                    {
+                                        <span class="kategori-chip" style="background:@gorev.Kategori.Renk;">
+                                            @gorev.Kategori.Ad <i class="bi bi-pencil-fill ms-1" style="font-size:0.65rem;"></i>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="kategori-chip kategori-chip-bos">
+                                            — Kategorisiz — <i class="bi bi-pencil-fill ms-1" style="font-size:0.65rem;"></i>
+                                        </span>
+                                    }
+                                </button>
                             </td>
                             <td>
                                 <span class="badge oncelik-badge @gorev.Oncelik.CssClass()">
@@ -165,4 +175,35 @@ else
             </table>
         </div>
     </div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            // Sunucudan gelen kullanıcı kategorilerini JS'e taşı
+            var kategoriler = @Html.Raw(Json.Serialize(kategoriler.Select(k => new { id = k.Id, ad = k.Ad, renk = k.Renk })));
+
+            document.querySelectorAll('.kategori-chip-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var gorevId = btn.dataset.gorevId;
+                    var mevcut = btn.dataset.mevcutKategoriId || null;
+                    GorevTakip.gorevKategoriDegistir(gorevId, mevcut, kategoriler, function (yeni) {
+                        // Chip'i güncelle (sayfayı yenilemeden)
+                        var ic = btn.querySelector('.kategori-chip');
+                        if (yeni.kategoriId) {
+                            ic.className = 'kategori-chip';
+                            ic.style.background = yeni.renk;
+                            ic.innerHTML = yeni.ad + ' <i class="bi bi-pencil-fill ms-1" style="font-size:0.65rem;"></i>';
+                            btn.dataset.mevcutKategoriId = yeni.kategoriId;
+                        } else {
+                            ic.className = 'kategori-chip kategori-chip-bos';
+                            ic.style.background = '';
+                            ic.innerHTML = '— Kategorisiz — <i class="bi bi-pencil-fill ms-1" style="font-size:0.65rem;"></i>';
+                            btn.dataset.mevcutKategoriId = '';
+                        }
+                    });
+                });
+            });
+        })();
+    </script>
 }
