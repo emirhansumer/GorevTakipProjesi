@@ -255,6 +255,32 @@ main {
     }
 }
 
+/* Görev tablosu sütun düzeni — satır kayması engellensin */
+.gorev-tablosu td,
+.gorev-tablosu th {
+    white-space: nowrap;
+}
+
+.gorev-tablosu td:first-child,
+.gorev-tablosu th:first-child {
+    white-space: normal;        /* görev başlığı uzayabilir */
+}
+
+.gorev-tablosu .gorev-islemler {
+    white-space: nowrap;
+    min-width: 130px;
+    text-align: end;
+}
+
+.gorev-tablosu .gorev-islemler .btn {
+    margin-left: 2px;
+}
+
+.gorev-tablosu .gorev-tarih {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
 .kategori-chip-bos {
     background: var(--gt-iptal-bg);
     color: var(--gt-text-muted);
