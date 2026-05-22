@@ -110,7 +110,10 @@
                                 </a>
                                 @if (gorev.Kategori is not null)
                                 {
-                                    <span class="kategori-chip ms-2" style="background:@gorev.Kategori.Renk; font-size: 0.7rem;">@gorev.Kategori.Ad</span>
+                                    <span class="kategori-chip ms-2" style="background:@gorev.Kategori.Renk; font-size: 0.7rem;">
+                                        <i class="bi @(string.IsNullOrWhiteSpace(gorev.Kategori.Ikon) ? "bi-bookmark" : gorev.Kategori.Ikon)"></i>
+                                        @gorev.Kategori.Ad
+                                    </span>
                                 }
                             </td>
                             <td class="text-end">

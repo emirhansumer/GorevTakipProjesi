@@ -20,7 +20,7 @@
                         @if (Model.Kategori is not null)
                         {
                             <span class="kategori-chip" style="background:@Model.Kategori.Renk;">
-                                <i class="bi bi-bookmark-fill"></i>@Model.Kategori.Ad
+                                <i class="bi @(string.IsNullOrWhiteSpace(Model.Kategori.Ikon) ? "bi-bookmark-fill" : Model.Kategori.Ikon)"></i>@Model.Kategori.Ad
                             </span>
                         }
                         <span class="badge fs-6 oncelik-badge @Model.Oncelik.CssClass()">

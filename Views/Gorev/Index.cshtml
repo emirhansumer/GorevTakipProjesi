@@ -55,7 +55,7 @@
                     <a asp-action="Index" asp-route-kategoriId="@kat.Id"
                        class="kategori-chip text-decoration-none @(aktif ? "" : "opacity-75")"
                        style="background:@kat.Renk;">
-                        <span class="kategori-dot" style="background:white; width:8px; height:8px; border:none;"></span>
+                        <i class="bi @(string.IsNullOrWhiteSpace(kat.Ikon) ? "bi-bookmark" : kat.Ikon)"></i>
                         @kat.Ad
                     </a>
                 }
@@ -124,6 +124,7 @@ else
                                     @if (gorev.Kategori is not null)
                                     {
                                         <span class="kategori-chip" style="background:@gorev.Kategori.Renk;">
+                                            <i class="bi @(string.IsNullOrWhiteSpace(gorev.Kategori.Ikon) ? "bi-bookmark" : gorev.Kategori.Ikon)"></i>
                                             @gorev.Kategori.Ad <i class="bi bi-pencil-fill ms-1" style="font-size:0.65rem;"></i>
                                         </span>
                                     }
@@ -181,7 +182,7 @@ else
     <script>
         (function () {
             // Sunucudan gelen kullanıcı kategorilerini JS'e taşı
-            var kategoriler = @Html.Raw(Json.Serialize(kategoriler.Select(k => new { id = k.Id, ad = k.Ad, renk = k.Renk })));
+            var kategoriler = @Html.Raw(Json.Serialize(kategoriler.Select(k => new { id = k.Id, ad = k.Ad, renk = k.Renk, ikon = string.IsNullOrWhiteSpace(k.Ikon) ? "bi-bookmark" : k.Ikon })));
 
             document.querySelectorAll('.kategori-chip-btn').forEach(function (btn) {
                 btn.addEventListener('click', function () {
@@ -191,9 +192,12 @@ else
                         // Chip'i güncelle (sayfayı yenilemeden)
                         var ic = btn.querySelector('.kategori-chip');
                         if (yeni.kategoriId) {
+                            // Yeni kategorinin ikonunu da bul
+                            var kat = kategoriler.find(function (k) { return k.id === yeni.kategoriId; });
+                            var ikon = (kat && kat.ikon) || 'bi-bookmark';
                             ic.className = 'kategori-chip';
                             ic.style.background = yeni.renk;
-                            ic.innerHTML = yeni.ad + ' <i class="bi bi-pencil-fill ms-1" style="font-size:0.65rem;"></i>';
+                            ic.innerHTML = '<i class="bi ' + ikon + '"></i> ' + yeni.ad + ' <i class="bi bi-pencil-fill ms-1" style="font-size:0.65rem;"></i>';
                             btn.dataset.mevcutKategoriId = yeni.kategoriId;
                         } else {
                             ic.className = 'kategori-chip kategori-chip-bos';
