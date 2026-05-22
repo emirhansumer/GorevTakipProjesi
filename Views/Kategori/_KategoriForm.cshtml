@@ -1,5 +1,21 @@
 @model KategoriFormViewModel
 
+@{
+    var renkler = new[]
+    {
+        "#6366f1", // indigo
+        "#ec4899", // pembe
+        "#10b981", // yeşil
+        "#f59e0b", // amber
+        "#ef4444", // kırmızı
+        "#06b6d4", // cyan
+        "#8b5cf6", // mor
+        "#f97316", // turuncu
+        "#14b8a6", // teal
+        "#64748b"  // gri
+    };
+}
+
 <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
 
 <input asp-for="Id" type="hidden" />
@@ -13,15 +29,70 @@
 </div>
 
 <div class="mb-3">
-    <label asp-for="Renk" class="form-label">
+    <label class="form-label">
         <i class="bi bi-palette me-1 text-muted"></i> Renk
     </label>
-    <div class="d-flex align-items-center gap-2">
-        <input asp-for="Renk" type="color" class="form-control form-control-color"
-               style="width:80px; height:42px;"
-               oninput="document.getElementById('renkHex').textContent = this.value;" />
-        <span id="renkHex" class="font-monospace text-muted">@Model.Renk</span>
-        <span class="text-muted small ms-auto">Görev listesinde bu renk gösterilecek</span>
+    <input asp-for="Renk" type="hidden" id="renkInput" />
+    <div class="renk-paleti d-flex flex-wrap gap-2 align-items-center">
+        @foreach (var renk in renkler)
+        {
+            var aktif = string.Equals(Model.Renk, renk, StringComparison.OrdinalIgnoreCase);
+            <button type="button"
+                    class="renk-secenek @(aktif ? "aktif" : "")"
+                    data-renk="@renk"
+                    style="background:@renk;"
+                    title="@renk"
+                    aria-label="@renk rengi seç">
+                @if (aktif)
+                {
+                    <i class="bi bi-check-lg"></i>
+                }
+            </button>
+        }
+        <label class="renk-secenek renk-ozel ms-1" title="Özel renk seç">
+            <i class="bi bi-eyedropper"></i>
+            <input type="color" id="ozelRenk" value="@Model.Renk" />
+        </label>
+        <span id="renkHex" class="font-monospace text-muted ms-2 small">@Model.Renk</span>
     </div>
-    <span asp-validation-for="Renk" class="text-danger small"></span>
+    <span asp-validation-for="Renk" class="text-danger small d-block mt-1"></span>
 </div>
+
+<script>
+    (function () {
+        var input = document.getElementById('renkInput');
+        var hexLabel = document.getElementById('renkHex');
+        var ozelRenk = document.getElementById('ozelRenk');
+        var butonlar = document.querySelectorAll('.renk-secenek[data-renk]');
+
+        function setRenk(renk) {
+            input.value = renk;
+            hexLabel.textContent = renk;
+            ozelRenk.value = renk;
+            butonlar.forEach(function (b) {
+                if (b.dataset.renk && b.dataset.renk.toLowerCase() === renk.toLowerCase()) {
+                    b.classList.add('aktif');
+                    if (!b.querySelector('i')) {
+                        var i = document.createElement('i');
+                        i.className = 'bi bi-check-lg';
+                        b.appendChild(i);
+                    }
+                } else {
+                    b.classList.remove('aktif');
+                    var icon = b.querySelector('i');
+                    if (icon) b.removeChild(icon);
+                }
+            });
+        }
+
+        butonlar.forEach(function (b) {
+            b.addEventListener('click', function () {
+                setRenk(b.dataset.renk);
+            });
+        });
+
+        ozelRenk.addEventListener('input', function () {
+            setRenk(ozelRenk.value);
+        });
+    })();
+</script>

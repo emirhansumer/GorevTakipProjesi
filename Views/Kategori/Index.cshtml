@@ -1,7 +1,6 @@
-@model IEnumerable<Kategori>
+@model IEnumerable<GorevTakip.Controllers.KategoriController.KategoriIstatistik>
 @{
     ViewData["Title"] = "Kategorilerim";
-    var gorevSayilari = ViewBag.GorevSayilari as Dictionary<int, int> ?? new();
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
@@ -29,20 +28,47 @@
 else
 {
     <div class="row g-3">
-        @foreach (var kategori in Model)
+        @foreach (var istatistik in Model)
         {
-            var sayi = gorevSayilari.GetValueOrDefault(kategori.Id, 0);
+            var kategori = istatistik.Kategori;
             <div class="col-md-6 col-lg-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
                             <span class="kategori-dot" style="background:@kategori.Renk;"></span>
-                            <h5 class="mb-0 ms-2">@kategori.Ad</h5>
+                            <h5 class="mb-0 ms-2 flex-grow-1">@kategori.Ad</h5>
                         </div>
-                        <div class="text-muted small mb-3">
-                            <i class="bi bi-list-check me-1"></i> @sayi görev
-                        </div>
+
+                        @if (istatistik.Toplam == 0)
+                        {
+                            <div class="text-muted small mb-3">
+                                <i class="bi bi-info-circle me-1"></i> Bu kategoride henüz görev yok
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex justify-content-between align-items-center mb-1 small">
+                                <span class="text-muted">
+                                    <i class="bi bi-check2-circle me-1"></i>
+                                    @istatistik.Tamamlanan / @istatistik.Toplam tamamlandı
+                                </span>
+                                <span class="fw-semibold" style="color:@kategori.Renk;">%@istatistik.Yuzde</span>
+                            </div>
+                            <div class="progress mb-3" style="height:6px;">
+                                <div class="progress-bar"
+                                     role="progressbar"
+                                     style="width:@istatistik.Yuzde%; background:@kategori.Renk;"
+                                     aria-valuenow="@istatistik.Yuzde"
+                                     aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                        }
+
                         <div class="d-flex gap-2">
+                            <a asp-controller="Gorev" asp-action="Index" asp-route-kategoriId="@kategori.Id"
+                               class="btn btn-sm btn-outline-secondary flex-fill" title="Görevleri gör">
+                                <i class="bi bi-eye"></i>
+                            </a>
                             <a asp-action="Edit" asp-route-id="@kategori.Id" class="btn btn-sm btn-outline-primary flex-fill">
                                 <i class="bi bi-pencil me-1"></i> Düzenle
                             </a>

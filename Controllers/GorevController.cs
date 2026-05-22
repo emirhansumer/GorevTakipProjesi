@@ -20,13 +20,18 @@ public class GorevController : Controller
 
     private int AktifKullaniciId => HttpContext.Session.GetKullaniciId()!.Value;
 
-    public async Task<IActionResult> Index(int? kategoriId = null)
+    public async Task<IActionResult> Index(int? kategoriId = null, bool kategorisiz = false)
     {
         ViewBag.Filtre = "tumu";
         ViewBag.Baslik = "Tüm Görevlerim";
         ViewBag.SeciliKategoriId = kategoriId;
+        ViewBag.Kategorisiz = kategorisiz;
 
-        if (kategoriId.HasValue)
+        if (kategorisiz)
+        {
+            ViewBag.Baslik = "Kategorisiz Görevler";
+        }
+        else if (kategoriId.HasValue)
         {
             var kategori = await _db.Kategoriler
                 .FirstOrDefaultAsync(k => k.Id == kategoriId && k.KullaniciId == AktifKullaniciId);
@@ -38,7 +43,7 @@ public class GorevController : Controller
         }
 
         await KategoriListesiniDoldur();
-        var gorevler = await GorevleriGetir(null, kategoriId);
+        var gorevler = await GorevleriGetir(null, kategoriId, kategorisiz);
         return View(gorevler);
     }
 
@@ -72,7 +77,7 @@ public class GorevController : Controller
         return View(gorev);
     }
 
-    private Task<List<Gorev>> GorevleriGetir(GorevDurum? durum, int? kategoriId)
+    private Task<List<Gorev>> GorevleriGetir(GorevDurum? durum, int? kategoriId, bool kategorisiz = false)
     {
         var sorgu = _db.Gorevler
             .Include(g => g.Kategori)
@@ -80,7 +85,9 @@ public class GorevController : Controller
 
         if (durum.HasValue)
             sorgu = sorgu.Where(g => g.Durum == durum.Value);
-        if (kategoriId.HasValue)
+        if (kategorisiz)
+            sorgu = sorgu.Where(g => g.KategoriId == null);
+        else if (kategoriId.HasValue)
             sorgu = sorgu.Where(g => g.KategoriId == kategoriId.Value);
 
         return sorgu

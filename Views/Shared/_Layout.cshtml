@@ -1,5 +1,8 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
+    var antiforgeryToken = Antiforgery.GetAndStoreTokens(HttpContextAccessor.HttpContext!).RequestToken;
+
     var session = HttpContextAccessor.HttpContext?.Session;
     var girisYapildi = session?.GirisYapildiMi() ?? false;
     var adSoyad = session?.GetAdSoyad();
@@ -22,6 +25,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="request-verification-token" content="@antiforgeryToken" />
     <title>@ViewData["Title"] - Görev Takip</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />

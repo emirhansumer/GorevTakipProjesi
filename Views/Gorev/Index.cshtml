@@ -4,6 +4,7 @@
     var filtre = ViewBag.Filtre as string ?? "tumu";
     var kategoriler = ViewBag.Kategoriler as List<Kategori> ?? new List<Kategori>();
     var seciliKategoriId = ViewBag.SeciliKategoriId as int?;
+    var kategorisizAktif = (bool)(ViewBag.Kategorisiz ?? false);
     ViewData["Title"] = baslik;
 
     var (emptyIcon, emptyText) = filtre switch
@@ -58,6 +59,11 @@
                         @kat.Ad
                     </a>
                 }
+                <a asp-action="Index" asp-route-kategorisiz="true"
+                   class="kategori-chip text-decoration-none @(kategorisizAktif ? "" : "opacity-75")"
+                   style="background:var(--gt-iptal); color:white;">
+                    <i class="bi bi-slash-circle"></i> Kategorisiz
+                </a>
             </div>
         </div>
     }

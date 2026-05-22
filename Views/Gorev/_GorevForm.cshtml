@@ -54,22 +54,43 @@
     <label asp-for="KategoriId" class="form-label">
         <i class="bi bi-bookmark me-1 text-muted"></i> Kategori
     </label>
-    <select asp-for="KategoriId" class="form-select">
-        <option value="">— Kategorisiz —</option>
-        @if (Model.KullaniciKategorileri is not null)
-        {
-            foreach (var kategori in Model.KullaniciKategorileri)
+    <div class="input-group">
+        <select asp-for="KategoriId" class="form-select" id="kategoriSelect">
+            <option value="">— Kategorisiz —</option>
+            @if (Model.KullaniciKategorileri is not null)
             {
-                <option value="@kategori.Id" data-renk="@kategori.Renk">@kategori.Ad</option>
+                foreach (var kategori in Model.KullaniciKategorileri)
+                {
+                    <option value="@kategori.Id" data-renk="@kategori.Renk">@kategori.Ad</option>
+                }
             }
-        }
-    </select>
+        </select>
+        <button type="button" class="btn btn-outline-primary" id="yeniKategoriBtn" title="Yeni kategori ekle">
+            <i class="bi bi-plus-lg"></i>
+        </button>
+    </div>
     <span asp-validation-for="KategoriId" class="text-danger small"></span>
-    @if (Model.KullaniciKategorileri is null || !Model.KullaniciKategorileri.Any())
-    {
-        <small class="text-muted">
-            <i class="bi bi-info-circle me-1"></i>
-            Henüz kategorin yok. <a asp-controller="Kategori" asp-action="Create">Kategori ekle</a>
-        </small>
-    }
+    <small class="text-muted">
+        <i class="bi bi-info-circle me-1"></i>
+        Hızlı kategori oluşturmak için "+" butonuna bas.
+    </small>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.getElementById('yeniKategoriBtn');
+        var select = document.getElementById('kategoriSelect');
+        if (btn && select) {
+            btn.addEventListener('click', function () {
+                GorevTakip.yeniKategoriEkle(function (yeni) {
+                    var opt = document.createElement('option');
+                    opt.value = yeni.id;
+                    opt.textContent = yeni.ad;
+                    opt.dataset.renk = yeni.renk;
+                    opt.selected = true;
+                    select.appendChild(opt);
+                });
+            });
+        }
+    });
+</script>
