@@ -121,10 +121,66 @@ window.GorevTakip = (function () {
         });
     }
 
+    // Inline kategori değiştirme — chip'e tıklayınca modal aç, yeni kategori seç
+    function gorevKategoriDegistir(gorevId, mevcutKategoriId, kategoriler, onSuccess) {
+        var html = '<div class="text-start">';
+        html += '<label class="form-label small fw-semibold">Yeni kategori seç</label>';
+        html += '<select id="swalKategoriDropdown" class="form-select">';
+        html += '<option value="" ' + (!mevcutKategoriId ? 'selected' : '') + '>— Kategorisiz —</option>';
+        (kategoriler || []).forEach(function (k) {
+            var sel = String(k.id) === String(mevcutKategoriId) ? 'selected' : '';
+            html += '<option value="' + k.id + '" ' + sel + '>' + k.ad + '</option>';
+        });
+        html += '</select>';
+        html += '<small class="text-muted d-block mt-2"><i class="bi bi-info-circle me-1"></i>Sayfa yenilenmeyecek, değişiklik anında uygulanır.</small>';
+        html += '</div>';
+
+        Swal.fire({
+            title: 'Kategori Değiştir',
+            html: html,
+            showCancelButton: true,
+            confirmButtonText: 'Uygula',
+            cancelButtonText: 'İptal',
+            confirmButtonColor: '#6366f1',
+            reverseButtons: true,
+            focusConfirm: false,
+            preConfirm: function () {
+                var sel = document.getElementById('swalKategoriDropdown');
+                var deger = sel.value;
+                var formData = new FormData();
+                formData.append('gorevId', gorevId);
+                if (deger) formData.append('kategoriId', deger);
+                formData.append('__RequestVerificationToken', csrfToken());
+                return fetch('/Gorev/KategoriDegistir', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                }).then(function (r) {
+                    return r.json().then(function (data) {
+                        if (!r.ok || !data.ok) {
+                            Swal.showValidationMessage(data.message || 'Güncellenemedi');
+                            return false;
+                        }
+                        return data;
+                    });
+                }).catch(function () {
+                    Swal.showValidationMessage('Sunucu hatası');
+                    return false;
+                });
+            }
+        }).then(function (result) {
+            if (result.isConfirmed && result.value && result.value.ok) {
+                toast('success', 'Kategori güncellendi');
+                if (typeof onSuccess === 'function') onSuccess(result.value);
+            }
+        });
+    }
+
     return {
         toast: toast,
         silOnayi: silOnayi,
         yeniKategoriEkle: yeniKategoriEkle,
+        gorevKategoriDegistir: gorevKategoriDegistir,
         csrfToken: csrfToken
     };
 })();
