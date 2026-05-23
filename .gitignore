@@ -361,3 +361,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# SQLite runtime dosyaları — uygulamanın yarattığı veri/cache, repo'ya girmez
+*.db
+*.db-shm
+*.db-wal
+
+# DataProtection key ring (her ortam için kendi keyleri üretsin)
+DataProtection-Keys/
