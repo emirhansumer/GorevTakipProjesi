@@ -110,8 +110,8 @@
                                 </a>
                                 @if (gorev.Kategori is not null)
                                 {
-                                    <span class="kategori-chip ms-2" style="background:@gorev.Kategori.Renk; font-size: 0.7rem;">
-                                        <i class="bi @(string.IsNullOrWhiteSpace(gorev.Kategori.Ikon) ? "bi-bookmark" : gorev.Kategori.Ikon)"></i>
+                                    <span class="kategori-chip @RenkHelper.ChipKoyuClass(gorev.Kategori.Renk) ms-2" style="background:@gorev.Kategori.Renk; font-size: 0.7rem;">
+                                        @Html.KategoriIkon(gorev.Kategori.Ikon)
                                         @gorev.Kategori.Ad
                                     </span>
                                 }
@@ -120,7 +120,9 @@
                                 <span class="badge oncelik-badge @gorev.Oncelik.CssClass() me-1">
                                     <i class="bi @gorev.Oncelik.Ikon() me-1"></i>@gorev.Oncelik.Etiket()
                                 </span>
-                                <span class="badge @gorev.Durum.CssClass()">@gorev.Durum.Etiket()</span>
+                                <span class="badge @gorev.Durum.CssClass()">
+                                    <i class="bi @gorev.Durum.Ikon() me-1"></i>@gorev.Durum.Etiket()
+                                </span>
                             </td>
                             <td class="text-end text-muted small" style="width:160px;">
                                 <i class="bi bi-clock me-1"></i>@gorev.OlusturmaTarihi.ToString("dd.MM.yyyy HH:mm")

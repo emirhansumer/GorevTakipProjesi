@@ -232,6 +232,171 @@ main {
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
+    /* Açık renkli arkaplanlarda (limon-yeşili gibi) okunabilirlik */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.kategori-chip svg,
+.kategori-chip > i.bi {
+    /* Beyaz ikon — koyu arkaplanlarda hafif gölge */
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+    flex-shrink: 0;
+}
+
+/* Arkaplan ACIK ise (sarı, limon-yeşili, beyaz) — text ve ikon KOYU olsun
+   JS otomatik ekler bu class'ı */
+.kategori-chip.chip-koyu-text {
+    color: #1e293b !important;
+    text-shadow: none !important;
+}
+
+.kategori-chip.chip-koyu-text svg,
+.kategori-chip.chip-koyu-text > i.bi {
+    color: #1e293b !important;
+    filter: none !important;
+}
+
+/* Kategori filtresi — hover dropdown */
+.kategori-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* "+N daha" yerine sade üç-nokta yuvarlak buton */
+.kategori-daha-buton {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--gt-border);
+    background: var(--gt-surface);
+    color: var(--gt-text-muted);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.kategori-daha-buton:hover,
+.kategori-daha-buton.aktif {
+    background: var(--gt-primary);
+    color: white;
+    border-color: var(--gt-primary);
+    transform: scale(1.08);
+}
+
+/* Kategorisiz chip stili — diğer chip'lerle aynı görsel ailede, ama sade gri */
+.kategori-chip-bos-stil {
+    background: var(--gt-iptal-bg) !important;
+    color: var(--gt-text-muted) !important;
+    text-shadow: none !important;
+}
+
+.kategori-chip-bos-stil svg,
+.kategori-chip-bos-stil i.bi {
+    filter: none !important;
+    color: var(--gt-text-muted);
+}
+
+/* Tümü/Bekleyen/Tamamlanan sekmeleri ile kategori chip'leri arasındaki dikey ince ayraç */
+.kategori-ayrac {
+    display: inline-block;
+    width: 1px;
+    height: 22px;
+    background: var(--gt-border);
+    margin: 0 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Kategori chip'i tıklanabilir buton — hover'da yumuşak yukarı kalkma + gölge */
+/* (Edit ikonu kaldırıldı, görsel ipucu olarak hover scale + shadow yeterli) */
+
+/* Mini renkli yuvarlak ikon (dropdown item için) */
+.kategori-ikon-mini {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 0.85rem !important;
+}
+
+.kategori-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 1000;
+    min-width: 240px;
+    max-height: 360px;
+    overflow-y: auto;
+    background: var(--gt-surface);
+    border: 1px solid var(--gt-border);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15), 0 1px 3px rgba(15, 23, 42, 0.06);
+    padding: 0.4rem;
+}
+
+/* Hover ya da focus-within → dropdown aç */
+.kategori-dropdown:hover .kategori-dropdown-menu,
+.kategori-dropdown:focus-within .kategori-dropdown-menu {
+    display: block;
+}
+
+/* Köprü — buton ile menü arasında boşluk olunca menü kapanmasın */
+.kategori-dropdown::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 6px;
+}
+
+.kategori-dropdown-baslik {
+    padding: 0.4rem 0.75rem 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gt-text-muted);
+    border-bottom: 1px solid var(--gt-border);
+    margin-bottom: 0.3rem;
+}
+
+.kategori-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.45rem 0.6rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--gt-text);
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: background-color 0.12s ease;
+}
+
+.kategori-dropdown-item:hover {
+    background: var(--gt-primary-light);
+    color: var(--gt-primary);
+}
+
+.kategori-dropdown-item.aktif {
+    background: var(--gt-primary);
+    color: white;
+}
+
+.kategori-dropdown-item.aktif .kategori-dot {
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.kategori-dropdown-item-ad {
+    flex: 1 1 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 /* Kategori sütununda chip sıkıştığında bozulmasın */
@@ -292,15 +457,15 @@ main {
     border: none;
     padding: 0;
     cursor: pointer;
-    transition: transform 0.1s ease;
 }
 
-.kategori-chip-btn:hover {
-    transform: scale(1.05);
+.kategori-chip-btn .kategori-chip {
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .kategori-chip-btn:hover .kategori-chip {
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
 }
 
 .kategori-ikon-yuvarlak {
@@ -313,6 +478,19 @@ main {
     color: white;
     font-size: 1rem;
     flex-shrink: 0;
+}
+
+/* Kategori kart başlığı — uzun adlar 2 satır, sonra "..." */
+.kategori-kart-baslik {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+    font-size: 1rem;
+    min-width: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 /* Drag-drop kategori sıralama */

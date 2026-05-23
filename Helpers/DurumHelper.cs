@@ -19,4 +19,12 @@ public static class DurumHelper
         GorevDurum.Iptal => "İptal",
         _ => durum.ToString()
     };
+
+    public static string Ikon(this GorevDurum durum) => durum switch
+    {
+        GorevDurum.Bekliyor => "bi-hourglass-split",
+        GorevDurum.Tamamlandi => "bi-check-circle-fill",
+        GorevDurum.Iptal => "bi-x-circle-fill",
+        _ => "bi-circle"
+    };
 }

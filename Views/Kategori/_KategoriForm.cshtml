@@ -34,7 +34,8 @@
         ("bi-gem",          "Önemli"),
         ("bi-trophy",       "Spor / Başarı"),
         ("bi-bicycle",      "Bisiklet"),
-        ("bi-pencil",       "Çalışma / Not")
+        ("bi-pencil",       "Çalışma / Not"),
+        ("ozel-futbol-topu","Futbol / Hakemlik")
     };
 }
 
@@ -93,7 +94,7 @@
                     data-ikon="@ikon.Ad"
                     title="@ikon.Etiket"
                     aria-label="@ikon.Etiket">
-                <i class="bi @ikon.Ad"></i>
+                @Html.KategoriIkon(ikon.Ad)
             </button>
         }
     </div>

@@ -213,11 +213,50 @@ window.GorevTakip = (function () {
         });
     }
 
+    // Bir rengin "açık" olup olmadığını ölçer (parlaklık luminance hesabı)
+    // Beyaz/sarı/limon-yeşili gibi açık arkaplanlarda beyaz text okunmaz
+    function arkaPlanAcikMi(bgRengi) {
+        if (!bgRengi) return false;
+        var m = bgRengi.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        var r, g, b;
+        if (m) {
+            r = +m[1]; g = +m[2]; b = +m[3];
+        } else if (bgRengi.charAt(0) === '#') {
+            var hex = bgRengi.length === 4
+                ? bgRengi.slice(1).split('').map(function (c) { return c + c; }).join('')
+                : bgRengi.slice(1);
+            r = parseInt(hex.slice(0, 2), 16);
+            g = parseInt(hex.slice(2, 4), 16);
+            b = parseInt(hex.slice(4, 6), 16);
+        } else {
+            return false;
+        }
+        // ITU-R BT.601 luminance
+        var lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        return lum > 0.62; // 0.62'den parlak = açık
+    }
+
+    // Tüm .kategori-chip'lere bakıp arkaplan açıksa "chip-koyu-text" class'ı ekler
+    function chipKontrastiniUygula(root) {
+        var kapsayici = root || document;
+        kapsayici.querySelectorAll('.kategori-chip').forEach(function (chip) {
+            var bg = chip.style.backgroundColor || getComputedStyle(chip).backgroundColor;
+            chip.classList.toggle('chip-koyu-text', arkaPlanAcikMi(bg));
+        });
+    }
+
+    // Sayfa yüklendiğinde otomatik uygula
+    document.addEventListener('DOMContentLoaded', function () {
+        chipKontrastiniUygula();
+    });
+
     return {
         toast: toast,
         silOnayi: silOnayi,
         yeniKategoriEkle: yeniKategoriEkle,
         gorevKategoriDegistir: gorevKategoriDegistir,
+        chipKontrastiniUygula: chipKontrastiniUygula,
+        arkaPlanAcikMi: arkaPlanAcikMi,
         csrfToken: csrfToken
     };
 })();

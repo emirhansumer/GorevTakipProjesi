@@ -46,25 +46,56 @@
 
     @if (kategoriler.Any() && filtre == "tumu")
     {
-        <div class="ms-auto d-flex align-items-center gap-2">
-            <span class="text-muted small">Kategori:</span>
-            <div class="d-flex flex-wrap gap-1">
-                @foreach (var kat in kategoriler)
-                {
-                    var aktif = seciliKategoriId == kat.Id;
-                    <a asp-action="Index" asp-route-kategoriId="@kat.Id"
-                       class="kategori-chip text-decoration-none @(aktif ? "" : "opacity-75")"
-                       style="background:@kat.Renk;">
-                        <i class="bi @(string.IsNullOrWhiteSpace(kat.Ikon) ? "bi-bookmark" : kat.Ikon)"></i>
-                        @kat.Ad
-                    </a>
-                }
-                <a asp-action="Index" asp-route-kategorisiz="true"
-                   class="kategori-chip text-decoration-none @(kategorisizAktif ? "" : "opacity-75")"
-                   style="background:var(--gt-iptal); color:white;">
-                    <i class="bi bi-slash-circle"></i> Kategorisiz
+        // Tek satırda göstereceğimiz maksimum kategori sayısı.
+        // Fazlası "+N daha" dropdown'una düşer (hover ile açılır).
+        const int gorunenLimit = 6;
+        var gorunen = kategoriler.Take(gorunenLimit).ToList();
+        var fazla = kategoriler.Skip(gorunenLimit).ToList();
+        var seciliFazlada = fazla.Any(k => k.Id == seciliKategoriId);
+
+        <div class="d-flex align-items-center gap-1 flex-nowrap kategori-filter-grup">
+            <span class="kategori-ayrac" aria-hidden="true"></span>
+            @foreach (var kat in gorunen)
+            {
+                var aktif = seciliKategoriId == kat.Id;
+                <a asp-action="Index" asp-route-kategoriId="@kat.Id"
+                   class="kategori-chip text-decoration-none @RenkHelper.ChipKoyuClass(kat.Renk) @(aktif ? "" : "opacity-75")"
+                   style="background:@kat.Renk;">
+                    @Html.KategoriIkon(kat.Ikon)
+                    @kat.Ad
                 </a>
-            </div>
+            }
+
+            @if (fazla.Any())
+            {
+                <div class="kategori-dropdown">
+                    <button type="button"
+                            class="kategori-daha-buton @(seciliFazlada ? "aktif" : "")"
+                            title="@fazla.Count kategori daha">
+                        <i class="bi bi-three-dots"></i>
+                    </button>
+                    <div class="kategori-dropdown-menu">
+                        <div class="kategori-dropdown-baslik">Diğer kategoriler (@fazla.Count)</div>
+                        @foreach (var kat in fazla)
+                        {
+                            var aktif = seciliKategoriId == kat.Id;
+                            <a asp-action="Index" asp-route-kategoriId="@kat.Id"
+                               class="kategori-dropdown-item @(aktif ? "aktif" : "")">
+                                <span class="kategori-ikon-yuvarlak kategori-ikon-mini" style="background:@kat.Renk;">
+                                    @Html.KategoriIkon(kat.Ikon)
+                                </span>
+                                <span class="kategori-dropdown-item-ad" title="@kat.Ad">@kat.Ad</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+
+            <a asp-action="Index" asp-route-kategorisiz="true"
+               class="kategori-chip kategori-chip-bos-stil text-decoration-none @(kategorisizAktif ? "" : "opacity-75")"
+               title="Kategorisi olmayan görevler">
+                <i class="bi bi-circle"></i> Kategorisiz
+            </a>
         </div>
     }
 </div>
@@ -123,15 +154,16 @@ else
                                         title="Kategoriyi değiştir">
                                     @if (gorev.Kategori is not null)
                                     {
-                                        <span class="kategori-chip" style="background:@gorev.Kategori.Renk;">
-                                            <i class="bi @(string.IsNullOrWhiteSpace(gorev.Kategori.Ikon) ? "bi-bookmark" : gorev.Kategori.Ikon)"></i>
-                                            @gorev.Kategori.Ad <i class="bi bi-pencil-fill ms-1" style="font-size:0.65rem;"></i>
+                                        <span class="kategori-chip @RenkHelper.ChipKoyuClass(gorev.Kategori.Renk)" style="background:@gorev.Kategori.Renk;">
+                                            @Html.KategoriIkon(gorev.Kategori.Ikon)
+                                            <span>@gorev.Kategori.Ad</span>
                                         </span>
                                     }
                                     else
                                     {
-                                        <span class="kategori-chip kategori-chip-bos">
-                                            — Kategorisiz — <i class="bi bi-pencil-fill ms-1" style="font-size:0.65rem;"></i>
+                                        <span class="kategori-chip kategori-chip-bos-stil">
+                                            <i class="bi bi-circle"></i>
+                                            <span>Kategorisiz</span>
                                         </span>
                                     }
                                 </button>
@@ -142,7 +174,9 @@ else
                                 </span>
                             </td>
                             <td>
-                                <span class="badge @gorev.Durum.CssClass()">@gorev.Durum.Etiket()</span>
+                                <span class="badge @gorev.Durum.CssClass()">
+                                    <i class="bi @gorev.Durum.Ikon() me-1"></i>@gorev.Durum.Etiket()
+                                </span>
                             </td>
                             <td class="gorev-tarih">
                                 @if (gorev.BitisTarihi.HasValue)
@@ -151,7 +185,7 @@ else
                                 }
                                 else
                                 {
-                                    <span class="text-muted">—</span>
+                                    <span class="text-muted small fst-italic">Tarih yok</span>
                                 }
                             </td>
                             <td class="text-muted small gorev-tarih">@gorev.OlusturmaTarihi.ToString("dd.MM.yyyy HH:mm")</td>
@@ -192,17 +226,18 @@ else
                         // Chip'i güncelle (sayfayı yenilemeden)
                         var ic = btn.querySelector('.kategori-chip');
                         if (yeni.kategoriId) {
-                            // Yeni kategorinin ikonunu da bul
                             var kat = kategoriler.find(function (k) { return k.id === yeni.kategoriId; });
                             var ikon = (kat && kat.ikon) || 'bi-bookmark';
-                            ic.className = 'kategori-chip';
+                            // Açık renk mi? hesaplayıp class ekle
+                            var koyuClass = GorevTakip.arkaPlanAcikMi(yeni.renk) ? ' chip-koyu-text' : '';
+                            ic.className = 'kategori-chip' + koyuClass;
                             ic.style.background = yeni.renk;
-                            ic.innerHTML = '<i class="bi ' + ikon + '"></i> ' + yeni.ad + ' <i class="bi bi-pencil-fill ms-1" style="font-size:0.65rem;"></i>';
+                            ic.innerHTML = '<i class="bi ' + ikon + '"></i><span>' + yeni.ad + '</span>';
                             btn.dataset.mevcutKategoriId = yeni.kategoriId;
                         } else {
-                            ic.className = 'kategori-chip kategori-chip-bos';
+                            ic.className = 'kategori-chip kategori-chip-bos-stil';
                             ic.style.background = '';
-                            ic.innerHTML = '— Kategorisiz — <i class="bi bi-pencil-fill ms-1" style="font-size:0.65rem;"></i>';
+                            ic.innerHTML = '<i class="bi bi-circle"></i><span>Kategorisiz</span>';
                             btn.dataset.mevcutKategoriId = '';
                         }
                     });
