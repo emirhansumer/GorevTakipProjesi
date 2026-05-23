@@ -45,9 +45,9 @@ else
                                 <i class="bi bi-grip-vertical"></i>
                             </button>
                             <span class="kategori-ikon-yuvarlak" style="background:@kategori.Renk;">
-                                <i class="bi @(string.IsNullOrWhiteSpace(kategori.Ikon) ? "bi-bookmark" : kategori.Ikon)"></i>
+                                @Html.KategoriIkon(kategori.Ikon)
                             </span>
-                            <h5 class="mb-0 ms-2 flex-grow-1">@kategori.Ad</h5>
+                            <h5 class="mb-0 ms-2 flex-grow-1 kategori-kart-baslik" title="@kategori.Ad">@kategori.Ad</h5>
                         </div>
 
                         @if (istatistik.Toplam == 0)

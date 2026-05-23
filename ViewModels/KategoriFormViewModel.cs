@@ -17,7 +17,7 @@ public class KategoriFormViewModel
     public string Renk { get; set; } = "#6366f1";
 
     [StringLength(50)]
-    [RegularExpression(@"^bi-[a-z0-9-]+$", ErrorMessage = "Geçerli bir ikon seçiniz.")]
+    [RegularExpression(@"^(bi|ozel)-[a-z0-9-]+$", ErrorMessage = "Geçerli bir ikon seçiniz.")]
     [Display(Name = "İkon")]
     public string Ikon { get; set; } = "bi-bookmark";
 }

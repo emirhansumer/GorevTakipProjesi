@@ -24,10 +24,10 @@ public static class OncelikHelper
 
     public static string Ikon(this Oncelik oncelik) => oncelik switch
     {
-        Oncelik.Dusuk => "bi-arrow-down",
-        Oncelik.Orta => "bi-dash",
-        Oncelik.Yuksek => "bi-arrow-up",
-        Oncelik.Acil => "bi-exclamation-triangle-fill",
-        _ => "bi-dash"
+        Oncelik.Dusuk => "bi-arrow-down-circle-fill",
+        Oncelik.Orta => "bi-dash-circle-fill",
+        Oncelik.Yuksek => "bi-arrow-up-circle-fill",
+        Oncelik.Acil => "bi-exclamation-octagon-fill",
+        _ => "bi-dash-circle-fill"
     };
 }

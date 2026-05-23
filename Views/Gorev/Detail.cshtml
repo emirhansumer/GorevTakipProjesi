@@ -19,14 +19,16 @@
                     <div class="d-flex gap-2 flex-wrap">
                         @if (Model.Kategori is not null)
                         {
-                            <span class="kategori-chip" style="background:@Model.Kategori.Renk;">
-                                <i class="bi @(string.IsNullOrWhiteSpace(Model.Kategori.Ikon) ? "bi-bookmark-fill" : Model.Kategori.Ikon)"></i>@Model.Kategori.Ad
+                            <span class="kategori-chip @RenkHelper.ChipKoyuClass(Model.Kategori.Renk)" style="background:@Model.Kategori.Renk;">
+                                @Html.KategoriIkon(Model.Kategori.Ikon)@Model.Kategori.Ad
                             </span>
                         }
                         <span class="badge fs-6 oncelik-badge @Model.Oncelik.CssClass()">
                             <i class="bi @Model.Oncelik.Ikon() me-1"></i>@Model.Oncelik.Etiket()
                         </span>
-                        <span class="badge fs-6 @Model.Durum.CssClass()">@Model.Durum.Etiket()</span>
+                        <span class="badge fs-6 @Model.Durum.CssClass()">
+                            <i class="bi @Model.Durum.Ikon() me-1"></i>@Model.Durum.Etiket()
+                        </span>
                     </div>
                 </div>
 
