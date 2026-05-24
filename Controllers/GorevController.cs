@@ -56,6 +56,65 @@ public class GorevController : Controller
         return View("Index", gorevler);
     }
 
+    // Takvim sayfası (FullCalendar.js render eder, view boş bir container)
+    public IActionResult Takvim()
+    {
+        return View();
+    }
+
+    // FullCalendar AJAX endpoint — bitiş tarihi olan görevleri JSON event olarak döner
+    [HttpGet]
+    public async Task<IActionResult> TakvimVerileri(DateTime? start, DateTime? end)
+    {
+        var sorgu = _db.Gorevler
+            .Include(g => g.Kategori)
+            .Where(g => g.KullaniciId == AktifKullaniciId && g.BitisTarihi.HasValue);
+
+        if (start.HasValue)
+            sorgu = sorgu.Where(g => g.BitisTarihi >= start.Value);
+        if (end.HasValue)
+            sorgu = sorgu.Where(g => g.BitisTarihi < end.Value);
+
+        var gorevler = await sorgu.ToListAsync();
+
+        var events = gorevler.Select(g => new
+        {
+            id = g.Id,
+            title = g.Baslik,
+            start = g.BitisTarihi!.Value.ToString("yyyy-MM-dd"),
+            allDay = true,
+            backgroundColor = OncelikRengi(g),
+            borderColor = OncelikRengi(g),
+            textColor = "#ffffff",
+            url = Url.Action("Detail", "Gorev", new { id = g.Id }),
+            extendedProps = new
+            {
+                durum = g.Durum.Etiket(),
+                durumKodu = g.Durum.ToString(),
+                kategoriAd = g.Kategori?.Ad,
+                kategoriRenk = g.Kategori?.Renk,
+                oncelik = g.Oncelik.Etiket()
+            }
+        });
+
+        return Json(events);
+    }
+
+    private static string OncelikRengi(Gorev g)
+    {
+        // Kategori rengi varsa onu kullan, yoksa öncelik renkine düş
+        if (!string.IsNullOrWhiteSpace(g.Kategori?.Renk))
+            return g.Kategori.Renk;
+        return g.Oncelik switch
+        {
+            Oncelik.Acil => "#dc2626",
+            Oncelik.Yuksek => "#f59e0b",
+            Oncelik.Orta => "#64748b",
+            Oncelik.Dusuk => "#0ea5e9",
+            _ => "#6366f1"
+        };
+    }
+
     public async Task<IActionResult> Bekleyen()
     {
         ViewBag.Baslik = "Bekleyen Görevler";

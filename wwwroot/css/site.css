@@ -792,6 +792,289 @@ dl.row dt {
     font-size: 0.875rem;
 }
 
+/* ===== Takvim (FullCalendar) — Modern premium görünüm ===== */
+.fc {
+    font-family: inherit;
+    --fc-border-color: var(--gt-border);
+    --fc-button-bg-color: var(--gt-surface);
+    --fc-button-border-color: var(--gt-border);
+    --fc-button-text-color: var(--gt-text);
+    --fc-button-hover-bg-color: var(--gt-primary-light);
+    --fc-button-hover-border-color: var(--gt-primary);
+    --fc-button-active-bg-color: var(--gt-primary);
+    --fc-button-active-border-color: var(--gt-primary-dark);
+    --fc-today-bg-color: rgba(99, 102, 241, 0.06);
+    --fc-page-bg-color: var(--gt-surface);
+    --fc-event-border-color: transparent;
+    --fc-list-event-hover-bg-color: var(--gt-primary-light);
+    --fc-neutral-bg-color: var(--gt-bg);
+}
+
+/* Tarih numaralarındaki link altı çizgiyi tamamen kaldır */
+.fc a,
+.fc a:hover,
+.fc .fc-daygrid-day-number,
+.fc .fc-col-header-cell-cushion,
+.fc .fc-list-day-text,
+.fc .fc-list-day-side-text {
+    text-decoration: none !important;
+    color: var(--gt-text);
+}
+
+/* Gün rakamları — şık konumlandırma */
+.fc .fc-daygrid-day-number {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--gt-text);
+    padding: 8px 10px;
+    transition: color 0.15s ease;
+}
+
+/* Diğer ay tarihleri çok soluk */
+.fc .fc-day-other .fc-daygrid-day-number {
+    color: var(--gt-border);
+    opacity: 0.7;
+}
+
+/* Hücreler — hover ile hafif aydınlanma */
+.fc .fc-daygrid-day {
+    transition: background-color 0.18s ease;
+}
+
+.fc .fc-daygrid-day:hover {
+    background-color: rgba(99, 102, 241, 0.04);
+}
+
+.fc .fc-daygrid-day:hover .fc-daygrid-day-number {
+    color: var(--gt-primary);
+}
+
+/* Üst toolbar — premium görünüm */
+.fc .fc-toolbar.fc-header-toolbar {
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+}
+
+.fc .fc-toolbar-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gt-text);
+    text-transform: capitalize;
+    letter-spacing: -0.01em;
+}
+
+.fc .fc-button {
+    border-radius: 8px !important;
+    font-weight: 500;
+    padding: 0.4rem 0.85rem;
+    box-shadow: none !important;
+    text-transform: capitalize;
+    transition: all 0.15s ease;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+    color: white;
+    background: var(--gt-primary);
+    border-color: var(--gt-primary-dark);
+}
+
+.fc .fc-button-primary:not(:disabled):hover {
+    transform: translateY(-1px);
+}
+
+.fc .fc-button-group {
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* "Bugün" hücresi — premium yuvarlak buton */
+.fc .fc-day-today {
+    background: var(--fc-today-bg-color) !important;
+}
+.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+    background: linear-gradient(135deg, var(--gt-primary) 0%, var(--gt-primary-dark) 100%);
+    color: white !important;
+    border-radius: 999px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 6px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4);
+}
+
+/* Hafta sonu hücreleri */
+.fc .fc-day-sat .fc-daygrid-day-number,
+.fc .fc-day-sun .fc-daygrid-day-number {
+    color: var(--gt-text-muted);
+}
+
+/* Tablo border'ları çok ince ve yumuşak */
+.fc .fc-scrollgrid {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--gt-border) !important;
+}
+
+.fc .fc-scrollgrid td,
+.fc .fc-scrollgrid th {
+    border-color: var(--gt-border);
+}
+
+.fc .fc-scrollgrid-section > * {
+    border-color: var(--gt-border) !important;
+}
+
+/* Gün başlıkları (PZT/SAL/...) — modern üst bar */
+.fc .fc-col-header {
+    background: linear-gradient(180deg, var(--gt-bg) 0%, var(--gt-surface) 100%);
+}
+
+.fc .fc-col-header-cell {
+    padding: 12px 0;
+    font-weight: 700;
+    color: var(--gt-text-muted);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--gt-border);
+}
+
+.fc .fc-col-header-cell-cushion {
+    color: var(--gt-text-muted) !important;
+    padding: 6px 4px;
+}
+
+/* Cumartesi/Pazar başlıkları biraz daha sönük */
+.fc .fc-day-sat.fc-col-header-cell,
+.fc .fc-day-sun.fc-col-header-cell {
+    color: var(--gt-iptal);
+}
+
+/* Event'ler — premium pill kart */
+.fc .fc-daygrid-event {
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.15s ease;
+    border: none !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    margin: 2px 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.fc .fc-daygrid-event::before {
+    /* Sol kenar parlak şerit — kategori/öncelik vurgusu */
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.fc .fc-daygrid-event:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.22);
+    text-decoration: none !important;
+}
+
+.fc .fc-event-title {
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.fc .fc-event-time {
+    opacity: 0.85;
+    font-weight: 500;
+}
+
+/* Uzun görev başlıkları — ellipsis ile kırpılsın */
+.fc .fc-daygrid-event .fc-event-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+}
+
+/* "all-day" yazısı eğer hala görünüyorsa gizle */
+.fc .fc-daygrid-event .fc-event-time:empty,
+.fc .fc-list-event-time {
+    display: none !important;
+}
+
+/* Liste görünümü — daha şık */
+.fc .fc-list-event-graphic {
+    padding-right: 10px;
+}
+
+.fc .fc-list-event-dot {
+    border-width: 6px !important;
+}
+
+.fc .fc-list-event-title a {
+    font-weight: 600;
+    color: var(--gt-text) !important;
+}
+
+.fc .fc-list-day-cushion {
+    background: var(--gt-bg);
+    padding: 10px 14px;
+    font-size: 0.85rem;
+}
+
+/* Aynı günde çok görev olursa — event yüksekliği sabit, hücre içeriği güzel sığsın */
+.fc .fc-daygrid-day-events {
+    margin-top: 0;
+}
+
+.fc .fc-daygrid-day-frame {
+    padding: 2px;
+}
+
+/* "+N daha" linki */
+.fc .fc-daygrid-more-link {
+    color: var(--gt-primary);
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.fc .fc-daygrid-more-link:hover {
+    background: var(--gt-primary-light);
+}
+
+/* Liste görünümü */
+.fc .fc-list-event:hover td {
+    background-color: var(--gt-primary-light);
+}
+
+.fc .fc-list-day-cushion {
+    background: var(--gt-bg);
+    font-weight: 700;
+}
+
+/* Boş ayda placeholder */
+.fc .fc-list-empty {
+    background: transparent;
+    color: var(--gt-text-muted);
+    font-style: italic;
+}
+
 /* ===== Empty state ===== */
 .empty-state {
     text-align: center;

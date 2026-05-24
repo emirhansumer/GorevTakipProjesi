@@ -1,0 +1,98 @@
+@{
+    ViewData["Title"] = "Takvim";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h2 class="mb-0">
+            <i class="bi bi-calendar3 me-2 text-primary"></i> Görev Takvimi
+        </h2>
+        <p class="text-muted mb-0 small">
+            <span id="takvimGorevSayisi"></span>
+            Görevler bitiş tarihine göre yerleştirilir. Tıklayınca detay açılır.
+        </p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Yeni Görev
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-3 p-md-4">
+        <div id="takvim"></div>
+    </div>
+</div>
+
+<div class="mt-3 d-flex flex-wrap gap-3 small text-muted">
+    <span><i class="bi bi-circle-fill me-1" style="color:#dc2626;"></i> Acil</span>
+    <span><i class="bi bi-circle-fill me-1" style="color:#f59e0b;"></i> Yüksek</span>
+    <span><i class="bi bi-circle-fill me-1" style="color:#64748b;"></i> Orta</span>
+    <span><i class="bi bi-circle-fill me-1" style="color:#0ea5e9;"></i> Düşük</span>
+    <span class="ms-auto"><i class="bi bi-info-circle me-1"></i> Kategori varsa kategorinin rengi kullanılır</span>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var el = document.getElementById('takvim');
+            if (!el || typeof FullCalendar === 'undefined') return;
+
+            var sayiSpan = document.getElementById('takvimGorevSayisi');
+
+            var takvim = new FullCalendar.Calendar(el, {
+                initialView: 'dayGridMonth',
+                locale: 'tr',
+                firstDay: 1, // Pazartesi
+                height: 'auto',
+                // Diğer ayların günlerini gösterme (boş hücre kalır ama tarih yazmaz)
+                showNonCurrentDates: false,
+                // Gereksiz 6. haftayı gösterme — ay 4 veya 5 haftaya sığıyorsa kırp
+                fixedWeekCount: false,
+                // Tüm görevler all-day olduğu için "all-day" yazısı gereksiz
+                displayEventTime: false,
+                allDayText: 'Tüm gün',
+                // Liste boş olursa Türkçe mesaj
+                noEventsText: 'Bu görünümde görev yok.',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,dayGridWeek,listMonth'
+                },
+                buttonText: {
+                    today: 'Bugün',
+                    month: 'Ay',
+                    week: 'Hafta',
+                    list: 'Liste'
+                },
+                events: '/Gorev/TakvimVerileri',
+                eventDisplay: 'block',
+                dayMaxEvents: 3,
+                moreLinkText: function (n) { return '+' + n + ' daha'; },
+                eventsSet: function (events) {
+                    if (sayiSpan) {
+                        sayiSpan.textContent = events.length > 0
+                            ? 'Bu görünümde ' + events.length + ' görev. '
+                            : '';
+                    }
+                },
+                eventDidMount: function (info) {
+                    // Hover tooltip — durum + kategori bilgisi
+                    var p = info.event.extendedProps;
+                    var parts = [info.event.title];
+                    if (p.durum) parts.push('Durum: ' + p.durum);
+                    if (p.oncelik) parts.push('Öncelik: ' + p.oncelik);
+                    if (p.kategoriAd) parts.push('Kategori: ' + p.kategoriAd);
+                    info.el.setAttribute('title', parts.join(' · '));
+                    // Tamamlanmış görevlere üstü çizili efekti
+                    if (p.durumKodu === 'Tamamlandi') {
+                        info.el.style.textDecoration = 'line-through';
+                        info.el.style.opacity = '0.65';
+                    } else if (p.durumKodu === 'Iptal') {
+                        info.el.style.opacity = '0.5';
+                    }
+                }
+            });
+            takvim.render();
+        });
+    </script>
+}
