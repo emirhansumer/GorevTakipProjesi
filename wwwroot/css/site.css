@@ -961,14 +961,15 @@ dl.row dt {
 
 /* Event'ler — premium pill kart */
 .fc .fc-daygrid-event {
+    --oncelik-renk: rgba(255, 255, 255, 0.5); /* JS override eder */
     border-radius: 8px;
-    padding: 4px 10px;
+    padding: 4px 10px 4px 14px; /* Sol şerit için ekstra padding */
     font-size: 0.78rem;
     font-weight: 600;
     cursor: pointer;
     transition: transform 0.12s ease, box-shadow 0.15s ease;
     border: none !important;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
     margin: 2px 4px;
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
     position: relative;
@@ -976,14 +977,15 @@ dl.row dt {
 }
 
 .fc .fc-daygrid-event::before {
-    /* Sol kenar parlak şerit — kategori/öncelik vurgusu */
+    /* Sol kenar şerit = ÖNCELİK rengi (background = kategori rengi olabilir) */
     content: '';
     position: absolute;
     left: 0;
     top: 0;
     bottom: 0;
-    width: 3px;
-    background: rgba(255, 255, 255, 0.4);
+    width: 5px;
+    background: var(--oncelik-renk);
+    box-shadow: 1px 0 0 rgba(255, 255, 255, 0.25);
 }
 
 .fc .fc-daygrid-event:hover {
@@ -1073,6 +1075,120 @@ dl.row dt {
     background: transparent;
     color: var(--gt-text-muted);
     font-style: italic;
+}
+
+/* ===== Modern arama kutusu (Linear/GitHub stili) ===== */
+.arama-form {
+    margin: 0;
+}
+
+.arama-kutu {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 280px;
+    height: 38px;
+    padding: 0 12px 0 36px;
+    background: var(--gt-surface);
+    border: 1px solid var(--gt-border);
+    border-radius: 999px;
+    transition: all 0.18s ease;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.arama-kutu:hover {
+    border-color: var(--gt-text-muted);
+    background: white;
+}
+
+.arama-kutu:focus-within {
+    width: 360px;
+    border-color: var(--gt-primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12), 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+.arama-kutu.dolu {
+    background: var(--gt-primary-light);
+    border-color: var(--gt-primary);
+}
+
+.arama-ikon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gt-text-muted);
+    font-size: 0.95rem;
+    pointer-events: none;
+    transition: color 0.15s ease;
+}
+
+.arama-kutu:focus-within .arama-ikon,
+.arama-kutu.dolu .arama-ikon {
+    color: var(--gt-primary);
+}
+
+.arama-input {
+    flex: 1 1 auto;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.875rem;
+    color: var(--gt-text);
+    min-width: 0;
+}
+
+.arama-input::placeholder {
+    color: var(--gt-text-muted);
+    opacity: 0.7;
+}
+
+.arama-input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.arama-temizle {
+    color: var(--gt-text-muted);
+    margin-left: 8px;
+    font-size: 1rem;
+    text-decoration: none;
+    line-height: 1;
+    transition: color 0.12s ease, transform 0.12s ease;
+    flex-shrink: 0;
+}
+
+.arama-temizle:hover {
+    color: var(--gt-primary);
+    transform: scale(1.15);
+}
+
+.arama-kisayol {
+    margin-left: 8px;
+    padding: 2px 7px;
+    background: var(--gt-bg);
+    border: 1px solid var(--gt-border);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--gt-text-muted);
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.arama-kutu:focus-within .arama-kisayol {
+    display: none;
+}
+
+/* Mobil — arama kutusu tam genişlik */
+@@media (max-width: 576px) {
+    .arama-kutu,
+    .arama-kutu:focus-within {
+        width: 100%;
+    }
 }
 
 /* ===== Empty state ===== */

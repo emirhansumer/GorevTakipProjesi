@@ -20,14 +20,19 @@ public class GorevController : Controller
 
     private int AktifKullaniciId => HttpContext.Session.GetKullaniciId()!.Value;
 
-    public async Task<IActionResult> Index(int? kategoriId = null, bool kategorisiz = false)
+    public async Task<IActionResult> Index(int? kategoriId = null, bool kategorisiz = false, string? q = null)
     {
         ViewBag.Filtre = "tumu";
         ViewBag.Baslik = "Tüm Görevlerim";
         ViewBag.SeciliKategoriId = kategoriId;
         ViewBag.Kategorisiz = kategorisiz;
+        ViewBag.AramaSorgusu = q;
 
-        if (kategorisiz)
+        if (!string.IsNullOrWhiteSpace(q))
+        {
+            ViewBag.Baslik = $"\"{q}\" arama sonuçları";
+        }
+        else if (kategorisiz)
         {
             ViewBag.Baslik = "Kategorisiz Görevler";
         }
@@ -43,7 +48,7 @@ public class GorevController : Controller
         }
 
         await KategoriListesiniDoldur();
-        var gorevler = await GorevleriGetir(null, kategoriId, kategorisiz);
+        var gorevler = await GorevleriGetir(null, kategoriId, kategorisiz, q);
         return View(gorevler);
     }
 
@@ -77,28 +82,46 @@ public class GorevController : Controller
 
         var gorevler = await sorgu.ToListAsync();
 
-        var events = gorevler.Select(g => new
+        var events = gorevler.Select(g =>
         {
-            id = g.Id,
-            title = g.Baslik,
-            start = g.BitisTarihi!.Value.ToString("yyyy-MM-dd"),
-            allDay = true,
-            backgroundColor = OncelikRengi(g),
-            borderColor = OncelikRengi(g),
-            textColor = "#ffffff",
-            url = Url.Action("Detail", "Gorev", new { id = g.Id }),
-            extendedProps = new
+            var oncelikRenk = OncelikRengiKodu(g.Oncelik);
+            var anaRenk = string.IsNullOrWhiteSpace(g.Kategori?.Renk) ? oncelikRenk : g.Kategori.Renk;
+            return new
             {
-                durum = g.Durum.Etiket(),
-                durumKodu = g.Durum.ToString(),
-                kategoriAd = g.Kategori?.Ad,
-                kategoriRenk = g.Kategori?.Renk,
-                oncelik = g.Oncelik.Etiket()
-            }
+                id = g.Id,
+                title = g.Baslik,
+                start = g.BitisTarihi!.Value.ToString("yyyy-MM-dd"),
+                allDay = true,
+                // Görsel düzenleme JS tarafında (Linear stili soft background)
+                // CSS variable'ları üzerinden inline style ile uygulanır.
+                backgroundColor = "transparent",
+                borderColor = "transparent",
+                textColor = anaRenk,
+                url = Url.Action("Detail", "Gorev", new { id = g.Id }),
+                extendedProps = new
+                {
+                    durum = g.Durum.Etiket(),
+                    durumKodu = g.Durum.ToString(),
+                    kategoriAd = g.Kategori?.Ad,
+                    kategoriRenk = g.Kategori?.Renk,
+                    oncelik = g.Oncelik.Etiket(),
+                    oncelikRenk = oncelikRenk,
+                    anaRenk = anaRenk
+                }
+            };
         });
 
         return Json(events);
     }
+
+    private static string OncelikRengiKodu(Oncelik oncelik) => oncelik switch
+    {
+        Oncelik.Acil => "#dc2626",
+        Oncelik.Yuksek => "#f59e0b",
+        Oncelik.Orta => "#64748b",
+        Oncelik.Dusuk => "#0ea5e9",
+        _ => "#6366f1"
+    };
 
     private static string OncelikRengi(Gorev g)
     {
@@ -136,7 +159,7 @@ public class GorevController : Controller
         return View(gorev);
     }
 
-    private Task<List<Gorev>> GorevleriGetir(GorevDurum? durum, int? kategoriId, bool kategorisiz = false)
+    private Task<List<Gorev>> GorevleriGetir(GorevDurum? durum, int? kategoriId, bool kategorisiz = false, string? aramaSorgusu = null)
     {
         var sorgu = _db.Gorevler
             .Include(g => g.Kategori)
@@ -148,6 +171,14 @@ public class GorevController : Controller
             sorgu = sorgu.Where(g => g.KategoriId == null);
         else if (kategoriId.HasValue)
             sorgu = sorgu.Where(g => g.KategoriId == kategoriId.Value);
+
+        if (!string.IsNullOrWhiteSpace(aramaSorgusu))
+        {
+            var ara = aramaSorgusu.Trim().ToLower();
+            sorgu = sorgu.Where(g =>
+                g.Baslik.ToLower().Contains(ara) ||
+                (g.Aciklama != null && g.Aciklama.ToLower().Contains(ara)));
+        }
 
         return sorgu
             .OrderByDescending(g => g.Oncelik)
