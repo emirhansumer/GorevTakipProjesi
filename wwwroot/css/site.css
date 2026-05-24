@@ -1,4 +1,5 @@
-:root {
+:root,
+:root[data-tema="light"] {
     --gt-primary: #6366f1;
     --gt-primary-dark: #4f46e5;
     --gt-primary-light: #eef2ff;
@@ -18,10 +19,418 @@
 
     --bs-primary: var(--gt-primary);
     --bs-primary-rgb: 99, 102, 241;
+
+    color-scheme: light;
+}
+
+/* Karanlık tema — Notion/Linear ilham — koyu mavi-gri taban (yüksek kontrast) */
+:root[data-tema="dark"] {
+    --gt-primary: #a5b4fc;          /* daha açık indigo, daha çarpıcı */
+    --gt-primary-dark: #818cf8;
+    --gt-primary-light: rgba(165, 180, 252, 0.18);
+    --gt-accent: #f472b6;
+    --gt-bg: #0a0f1c;               /* en koyu — gerçek "page" arkaplan */
+    --gt-surface: #161f33;          /* kartlar — daha açık ki belirgin olsun */
+    --gt-border: #334155;           /* daha açık border — kartlar daha belirgin */
+    --gt-text: #f8fafc;             /* neredeyse beyaz */
+    --gt-text-muted: #cbd5e1;       /* daha parlak muted, kontrast yüksek */
+
+    --gt-bekliyor: #fbbf24;
+    --gt-bekliyor-bg: rgba(251, 191, 36, 0.15);
+    --gt-tamamlandi: #34d399;
+    --gt-tamamlandi-bg: rgba(52, 211, 153, 0.15);
+    --gt-iptal: #94a3b8;
+    --gt-iptal-bg: rgba(148, 163, 184, 0.15);
+
+    --bs-primary: var(--gt-primary);
+    --bs-primary-rgb: 129, 140, 248;
+
+    color-scheme: dark;
 }
 
 html, body {
     height: 100%;
+}
+
+/* ===== Dark mode genel override'ları ===== */
+:root[data-tema="dark"] body { background-color: var(--gt-bg); color: var(--gt-text); }
+:root[data-tema="dark"] .card { background-color: var(--gt-surface); border-color: var(--gt-border); color: var(--gt-text); }
+:root[data-tema="dark"] .card-header { background-color: var(--gt-surface); border-bottom-color: var(--gt-border); color: var(--gt-text); }
+:root[data-tema="dark"] .form-control,
+:root[data-tema="dark"] .form-select,
+:root[data-tema="dark"] .input-group-text {
+    background-color: var(--gt-bg);
+    border-color: var(--gt-border);
+    color: var(--gt-text);
+}
+:root[data-tema="dark"] .form-control::placeholder { color: var(--gt-text-muted); }
+:root[data-tema="dark"] .form-control:focus,
+:root[data-tema="dark"] .form-select:focus { background-color: var(--gt-surface); color: var(--gt-text); }
+:root[data-tema="dark"] .form-label { color: var(--gt-text); }
+:root[data-tema="dark"] .input-group-text { background-color: var(--gt-surface) !important; }
+:root[data-tema="dark"] .table { --bs-table-color: var(--gt-text); --bs-table-bg: transparent; color: var(--gt-text); }
+:root[data-tema="dark"] .table > thead { color: var(--gt-text-muted); }
+:root[data-tema="dark"] .table > thead > tr > th { border-bottom-color: var(--gt-border); }
+:root[data-tema="dark"] .table > tbody > tr > td { border-color: var(--gt-border); }
+:root[data-tema="dark"] .table-hover { --bs-table-hover-bg: rgba(129, 140, 248, 0.08); --bs-table-hover-color: var(--gt-text); }
+:root[data-tema="dark"] .btn-outline-secondary { color: var(--gt-text-muted); border-color: var(--gt-border); }
+:root[data-tema="dark"] .btn-outline-secondary:hover { background-color: var(--gt-surface); color: var(--gt-text); }
+:root[data-tema="dark"] .btn-outline-primary { color: var(--gt-primary); }
+:root[data-tema="dark"] .btn-outline-danger { color: #fca5a5; border-color: rgba(252, 165, 165, 0.4); }
+:root[data-tema="dark"] .btn-outline-danger:hover { background-color: #dc2626; color: white; }
+:root[data-tema="dark"] .alert { color: var(--gt-text); }
+:root[data-tema="dark"] .alert-success { background-color: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.3); color: #6ee7b7; }
+:root[data-tema="dark"] .alert-danger { background-color: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.3); color: #fca5a5; }
+:root[data-tema="dark"] .alert-info { background-color: rgba(129, 140, 248, 0.12); border-color: rgba(129, 140, 248, 0.3); color: #a5b4fc; }
+:root[data-tema="dark"] .text-muted { color: var(--gt-text-muted) !important; }
+:root[data-tema="dark"] .bg-light { background-color: var(--gt-bg) !important; color: var(--gt-text); }
+:root[data-tema="dark"] .border { border-color: var(--gt-border) !important; }
+:root[data-tema="dark"] hr { border-color: var(--gt-border); }
+:root[data-tema="dark"] code { color: var(--gt-text); background-color: var(--gt-bg); padding: 2px 6px; border-radius: 4px; }
+:root[data-tema="dark"] .empty-state .empty-icon { color: var(--gt-border); }
+:root[data-tema="dark"] .nav-pills { background-color: var(--gt-surface); border-color: var(--gt-border); }
+:root[data-tema="dark"] .nav-pills .nav-link { color: var(--gt-text-muted); }
+:root[data-tema="dark"] .nav-pills .nav-link:not(.active):hover { background-color: rgba(129, 140, 248, 0.1); color: var(--gt-primary); }
+:root[data-tema="dark"] .footer { background-color: var(--gt-surface); border-top-color: var(--gt-border); color: var(--gt-text-muted); }
+:root[data-tema="dark"] .auth-card { background-color: var(--gt-surface); border-color: var(--gt-border); }
+:root[data-tema="dark"] .renk-paleti,
+:root[data-tema="dark"] .ikon-paleti { background-color: var(--gt-bg); border-color: var(--gt-border); }
+:root[data-tema="dark"] .ikon-secenek { background-color: var(--gt-surface); color: var(--gt-text); }
+:root[data-tema="dark"] .ikon-secenek:hover { border-color: var(--gt-primary); }
+:root[data-tema="dark"] .kategori-daha-buton { background-color: var(--gt-surface); border-color: var(--gt-border); color: var(--gt-text-muted); }
+:root[data-tema="dark"] .kategori-dropdown-menu { background-color: var(--gt-surface); border-color: var(--gt-border); }
+:root[data-tema="dark"] .kategori-dropdown-item { color: var(--gt-text); }
+:root[data-tema="dark"] .kategori-dropdown-item:hover { background-color: rgba(129, 140, 248, 0.1); }
+:root[data-tema="dark"] .kategori-dropdown-baslik { color: var(--gt-text-muted); border-bottom-color: var(--gt-border); }
+:root[data-tema="dark"] .kategori-chip-bos-stil { background-color: rgba(148, 163, 184, 0.15) !important; color: var(--gt-text-muted) !important; }
+:root[data-tema="dark"] .arama-kutu { background-color: var(--gt-surface); border-color: var(--gt-border); }
+:root[data-tema="dark"] .arama-kutu:hover { background-color: var(--gt-bg); }
+:root[data-tema="dark"] .arama-kutu:focus-within { background-color: var(--gt-bg); }
+:root[data-tema="dark"] .arama-input { color: var(--gt-text); }
+:root[data-tema="dark"] .arama-kisayol { background-color: var(--gt-bg); border-color: var(--gt-border); color: var(--gt-text-muted); }
+:root[data-tema="dark"] .fc-day-today { background: rgba(129, 140, 248, 0.1) !important; }
+:root[data-tema="dark"] .fc-scrollgrid,
+:root[data-tema="dark"] .fc-scrollgrid td,
+:root[data-tema="dark"] .fc-scrollgrid th { border-color: var(--gt-border) !important; }
+:root[data-tema="dark"] .fc-col-header { background: linear-gradient(180deg, var(--gt-bg) 0%, var(--gt-surface) 100%); }
+:root[data-tema="dark"] .fc-col-header-cell-cushion { color: var(--gt-text-muted) !important; }
+:root[data-tema="dark"] .fc-daygrid-day-number { color: var(--gt-text); }
+:root[data-tema="dark"] .fc-day-other .fc-daygrid-day-number { color: var(--gt-border); }
+:root[data-tema="dark"] .fc-button-primary { background-color: var(--gt-surface) !important; border-color: var(--gt-border) !important; color: var(--gt-text) !important; }
+:root[data-tema="dark"] .fc-button-primary:hover { background-color: var(--gt-bg) !important; }
+:root[data-tema="dark"] .fc-button-active { background-color: var(--gt-primary) !important; color: white !important; }
+:root[data-tema="dark"] .fc-toolbar-title { color: var(--gt-text) !important; }
+:root[data-tema="dark"] .fc-list-day-cushion,
+:root[data-tema="dark"] .fc-list-table { background-color: var(--gt-surface) !important; color: var(--gt-text); }
+:root[data-tema="dark"] .fc-list-event:hover td { background-color: var(--gt-bg) !important; }
+:root[data-tema="dark"] .stat-card { color: white; }
+:root[data-tema="dark"] .progress { background-color: var(--gt-bg); }
+:root[data-tema="dark"] .badge.bg-warning { background-color: var(--gt-bekliyor-bg) !important; color: var(--gt-bekliyor) !important; }
+:root[data-tema="dark"] .badge.bg-success { background-color: var(--gt-tamamlandi-bg) !important; color: var(--gt-tamamlandi) !important; }
+:root[data-tema="dark"] .badge.bg-secondary { background-color: var(--gt-iptal-bg) !important; color: var(--gt-iptal) !important; }
+:root[data-tema="dark"] .oncelik-dusuk { background-color: rgba(56, 189, 248, 0.15) !important; color: #7dd3fc !important; }
+:root[data-tema="dark"] .oncelik-orta { background-color: rgba(148, 163, 184, 0.18) !important; color: #cbd5e1 !important; }
+:root[data-tema="dark"] .oncelik-yuksek { background-color: rgba(251, 191, 36, 0.18) !important; color: #fcd34d !important; }
+:root[data-tema="dark"] .oncelik-acil { background-color: rgba(239, 68, 68, 0.18) !important; color: #fca5a5 !important; }
+:root[data-tema="dark"] .profile-avatar { box-shadow: 0 4px 14px rgba(129, 140, 248, 0.5); }
+:root[data-tema="dark"] dl.row dt { color: var(--gt-text-muted); }
+:root[data-tema="dark"] .form-control-color::-webkit-color-swatch-wrapper { padding: 0; }
+:root[data-tema="dark"] .renk-ozel { box-shadow: 0 0 0 1px var(--gt-border); }
+
+/* ========================================
+   Dark Mode — Glow / Kontrast iyileştirmeleri
+   ======================================== */
+
+/* Daha yüksek text kontrastı */
+:root[data-tema="dark"] {
+    --gt-text: #f1f5f9;
+}
+
+:root[data-tema="dark"] body {
+    background-image:
+        radial-gradient(ellipse 60% 40% at 15% 0%, rgba(99, 102, 241, 0.05), transparent 60%),
+        radial-gradient(ellipse 50% 40% at 85% 0%, rgba(236, 72, 153, 0.035), transparent 60%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+/* Navbar — daha derin gradient + soft glow */
+:root[data-tema="dark"] .navbar.bg-primary {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%) !important;
+    box-shadow: 0 4px 24px rgba(99, 102, 241, 0.35), 0 1px 0 rgba(255, 255, 255, 0.1) inset;
+}
+
+/* Card — üst kenarda subtle aydınlık + daha derin gölge */
+:root[data-tema="dark"] .card {
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.06) inset,
+        0 4px 12px rgba(0, 0, 0, 0.4),
+        0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-tema="dark"] .shadow-sm {
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.06) inset,
+        0 4px 12px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Primary buton — mor glow */
+:root[data-tema="dark"] .btn-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+    border-color: #6366f1;
+    box-shadow: 0 4px 14px rgba(129, 140, 248, 0.4), 0 1px 0 rgba(255, 255, 255, 0.15) inset;
+    color: white;
+}
+
+:root[data-tema="dark"] .btn-primary:hover {
+    background: linear-gradient(135deg, #818cf8 0%, #a5b4fc 100%);
+    box-shadow: 0 6px 20px rgba(129, 140, 248, 0.6), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+    transform: translateY(-1px);
+}
+
+/* Form focus — mor glow halkası */
+:root[data-tema="dark"] .btn:focus,
+:root[data-tema="dark"] .form-control:focus,
+:root[data-tema="dark"] .form-select:focus {
+    box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.25) !important;
+    border-color: var(--gt-primary) !important;
+}
+
+/* Arama kutusu focus'ta daha bariz glow */
+:root[data-tema="dark"] .arama-kutu:focus-within {
+    box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.22), 0 2px 12px rgba(129, 140, 248, 0.3);
+    border-color: var(--gt-primary);
+}
+
+/* Tema toggle butonu (navbar'da) — koyu modda hafif glow */
+:root[data-tema="dark"] .tema-toggle {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+}
+
+:root[data-tema="dark"] .tema-toggle:hover {
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.15);
+}
+
+/* Aktif nav-link (navbar'da) — koyu modda glow vurgusu */
+:root[data-tema="dark"] .navbar .nav-link.active {
+    background: rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+/* Stat kartları (Dashboard) — daha derin gradient + üst highlight */
+:root[data-tema="dark"] .stat-card {
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.15) inset,
+        0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-tema="dark"] .stat-card:hover {
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.2) inset,
+        0 16px 40px rgba(0, 0, 0, 0.6),
+        0 0 30px rgba(129, 140, 248, 0.25);
+}
+
+/* Kategori dropdown menü — daha derin gölge */
+:root[data-tema="dark"] .kategori-dropdown-menu {
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.06) inset,
+        0 20px 50px rgba(0, 0, 0, 0.6),
+        0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* SweetAlert modal — koyu uyumlu */
+:root[data-tema="dark"] .swal2-popup {
+    background: var(--gt-surface) !important;
+    color: var(--gt-text) !important;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.08) inset,
+        0 30px 80px rgba(0, 0, 0, 0.7) !important;
+}
+
+:root[data-tema="dark"] .swal2-title,
+:root[data-tema="dark"] .swal2-html-container { color: var(--gt-text) !important; }
+
+:root[data-tema="dark"] .swal2-input {
+    background: var(--gt-bg) !important;
+    color: var(--gt-text) !important;
+    border-color: var(--gt-border) !important;
+}
+
+/* Toast — koyu surface */
+:root[data-tema="dark"] .swal2-toast {
+    background: var(--gt-surface) !important;
+    color: var(--gt-text) !important;
+}
+
+/* Takvim — bugün glow */
+:root[data-tema="dark"] .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+    box-shadow:
+        0 4px 16px rgba(129, 140, 248, 0.6),
+        0 0 0 3px rgba(129, 140, 248, 0.2);
+}
+
+/* Kategori kartlarındaki yuvarlak ikon — glow */
+:root[data-tema="dark"] .kategori-ikon-yuvarlak {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Profil avatar — daha bariz glow */
+:root[data-tema="dark"] .profile-avatar {
+    box-shadow:
+        0 0 0 4px rgba(129, 140, 248, 0.15),
+        0 8px 24px rgba(129, 140, 248, 0.4);
+}
+
+/* Görev başlık linki hover'da glow */
+:root[data-tema="dark"] .gorev-baslik-link:hover {
+    color: #a5b4fc;
+    text-shadow: 0 0 12px rgba(165, 180, 252, 0.4);
+}
+
+/* Auth hero gradient — daha canlı (koyu modda) */
+:root[data-tema="dark"] .auth-hero {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
+    box-shadow: 0 20px 60px rgba(99, 102, 241, 0.3), 0 1px 0 rgba(255, 255, 255, 0.15) inset;
+}
+
+/* İkon paleti aktif ikonu — koyu modda glow */
+:root[data-tema="dark"] .ikon-secenek.aktif {
+    box-shadow: 0 0 0 1px var(--gt-primary), 0 4px 16px rgba(129, 140, 248, 0.5);
+}
+
+/* Renk paleti aktif rengi etrafında glow */
+:root[data-tema="dark"] .renk-secenek.aktif {
+    box-shadow: 0 0 0 2px var(--gt-surface), 0 0 0 4px var(--gt-primary), 0 4px 14px rgba(129, 140, 248, 0.5);
+}
+
+/* Nav pills aktif — glow */
+:root[data-tema="dark"] .nav-pills .nav-link.active {
+    background-color: var(--gt-primary);
+    color: white;
+    box-shadow: 0 4px 16px rgba(129, 140, 248, 0.5);
+}
+
+/* ========================================
+   Dark Mode — Eksik fix'ler (proaktif)
+   ======================================== */
+
+/* Chip ikonlarının drop-shadow'u karanlık modda siyah halo yaratıyor →
+   karanlık arkaplanda siyah halo görünmüyor, ikon kayboluyor.
+   Karanlık modda halo açık ton yapalım, veya kategorisiz chip'lerde tamamen kaldıralım */
+:root[data-tema="dark"] .kategori-chip svg,
+:root[data-tema="dark"] .kategori-chip > i.bi {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+/* Kategorisiz chip — ikon mevcut text rengini al, filter siyah halo'yu sil */
+:root[data-tema="dark"] .kategori-chip-bos-stil > i.bi,
+:root[data-tema="dark"] .kategori-chip-bos-stil svg {
+    filter: none !important;
+    color: var(--gt-text-muted) !important;
+}
+
+/* Görev başlığı linki (gorev-baslik-link) — varsayılan rengini yakala */
+:root[data-tema="dark"] .gorev-baslik-link { color: var(--gt-text); }
+
+/* Login/Register auth-card karanlıkta uygun olsun (zaten card override'ı var ama explicit) */
+:root[data-tema="dark"] .auth-card {
+    background: var(--gt-surface);
+    border-color: var(--gt-border);
+    color: var(--gt-text);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.08) inset,
+        0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-tema="dark"] .auth-card h3 { color: var(--gt-text); }
+
+/* Input group text (sol başta ikon olan) Açık modda beyaz arkaplan, koyu modda surface */
+:root[data-tema="dark"] .auth-card .input-group-text {
+    background-color: var(--gt-bg) !important;
+    border-color: var(--gt-border);
+    color: var(--gt-text-muted);
+}
+
+/* Detay sayfasındaki bilgi kutuları (border rounded) */
+:root[data-tema="dark"] .border.rounded-3 {
+    background: var(--gt-bg);
+    border-color: var(--gt-border) !important;
+}
+
+/* Detail/Profil dl.row — daha okunaklı kontrast */
+:root[data-tema="dark"] dl.row dd { color: var(--gt-text); }
+
+/* Hata sayfaları (Error/StatusCode) — büyük rakam vs. text okunsun */
+:root[data-tema="dark"] .display-1 { text-shadow: 0 0 30px rgba(129, 140, 248, 0.4); }
+
+/* Validation hata mesajları */
+:root[data-tema="dark"] .text-danger,
+:root[data-tema="dark"] .field-validation-error,
+:root[data-tema="dark"] .validation-summary-errors { color: #fca5a5 !important; }
+
+/* Dropdown menü (Bootstrap'in default'u) — koyu */
+:root[data-tema="dark"] .dropdown-menu {
+    background: var(--gt-surface);
+    border-color: var(--gt-border);
+    color: var(--gt-text);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-tema="dark"] .dropdown-item { color: var(--gt-text); }
+:root[data-tema="dark"] .dropdown-item:hover { background: rgba(129, 140, 248, 0.12); color: var(--gt-primary); }
+
+/* Tema toggle dropdown menü içindeki tikler/ikonlar */
+:root[data-tema="dark"] .tema-menu { background: var(--gt-surface); border-color: var(--gt-border); }
+:root[data-tema="dark"] .tema-menu .dropdown-item:hover { background: rgba(129, 140, 248, 0.15); }
+
+/* Renk paleti hex göstergesi */
+:root[data-tema="dark"] #renkHex { color: var(--gt-text-muted); }
+
+/* "Sürüklemek için" notu */
+:root[data-tema="dark"] .kategori-surukle-tut { color: var(--gt-text-muted); }
+:root[data-tema="dark"] .kategori-surukle-tut:hover { color: var(--gt-primary); }
+
+/* Stat card sayıları text-shadow ile pop */
+:root[data-tema="dark"] .stat-card .stat-value {
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Empty state ikonu karanlık modda görünür kalsın */
+:root[data-tema="dark"] .empty-state .empty-icon {
+    color: var(--gt-border);
+    opacity: 0.5;
+}
+
+/* Login sayfasındaki TempData success alert hover */
+:root[data-tema="dark"] .alert-success .bi { color: #34d399; }
+:root[data-tema="dark"] .alert-danger .bi { color: #f87171; }
+:root[data-tema="dark"] .alert-info .bi { color: #a5b4fc; }
+
+/* Footer code-slash ikon */
+:root[data-tema="dark"] .footer .bi { color: var(--gt-text-muted); }
+
+/* SweetAlert ikonları (success, warning, info) renk uyumu */
+:root[data-tema="dark"] .swal2-icon.swal2-warning { border-color: #fbbf24; color: #fbbf24; }
+:root[data-tema="dark"] .swal2-icon.swal2-success .swal2-success-line-tip,
+:root[data-tema="dark"] .swal2-icon.swal2-success .swal2-success-line-long { background-color: #34d399; }
+:root[data-tema="dark"] .swal2-validation-message {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #fca5a5 !important;
+}
+
+/* Form-control-color (HTML5 color picker) border */
+:root[data-tema="dark"] .form-control-color {
+    background: var(--gt-bg);
+    border-color: var(--gt-border);
+}
+
+/* Detay sayfasındaki açıklama kutusu (bg-light) */
+:root[data-tema="dark"] .card-body .bg-light {
+    background: var(--gt-bg) !important;
+    color: var(--gt-text);
 }
 
 body {
@@ -64,6 +473,69 @@ main {
 .navbar .btn-link.nav-link {
     background: none;
     border: none;
+}
+
+/* Tema toggle butonu */
+.tema-toggle {
+    background: rgba(255, 255, 255, 0.12);
+    border: none;
+    color: white;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.18s ease, transform 0.18s ease;
+    margin: 0 6px;
+}
+
+.tema-toggle:hover {
+    background: rgba(255, 255, 255, 0.22);
+    transform: scale(1.08);
+}
+
+.tema-menu {
+    min-width: 200px;
+    padding: 0.4rem;
+    border-radius: 12px;
+    border: 1px solid var(--gt-border);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+    background: var(--gt-surface);
+}
+
+.tema-menu .dropdown-item {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    color: var(--gt-text);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background-color 0.12s ease;
+}
+
+.tema-menu .dropdown-item:hover {
+    background: var(--gt-primary-light);
+    color: var(--gt-primary);
+}
+
+.tema-tik {
+    opacity: 0;
+    color: var(--gt-primary);
+    font-size: 0.95rem;
+}
+
+/* Aktif tema item'ında tik göster */
+.tema-secenek.aktif .tema-tik {
+    opacity: 1;
+}
+
+.tema-secenek.aktif {
+    background: var(--gt-primary-light);
+    color: var(--gt-primary);
 }
 
 /* ===== Buttons ===== */
@@ -1189,6 +1661,209 @@ dl.row dt {
     .arama-kutu:focus-within {
         width: 100%;
     }
+}
+
+/* ===== SweetAlert2 — Premium polish ===== */
+.swal2-popup {
+    border-radius: 16px !important;
+    border: 1px solid var(--gt-border) !important;
+    /* Backdrop YOK, popup tek başına yüzüyor — gölge daha derin olsun ki dikkat çeksin */
+    box-shadow:
+        0 30px 80px -10px rgba(15, 23, 42, 0.35),
+        0 15px 40px -5px rgba(15, 23, 42, 0.2),
+        0 5px 15px rgba(15, 23, 42, 0.1),
+        0 1px 0 rgba(255, 255, 255, 0.6) inset !important;
+    padding: 1.6rem 1.4rem 1.2rem !important;
+    font-family: inherit !important;
+}
+
+/* TÜM SweetAlert container'larından backdrop/blur tamamen kaldırıldı —
+   ne modal'da ne toast'ta arka plan karartması veya bulanıklığı olmaz */
+.swal2-container,
+.swal2-container.swal2-backdrop-show {
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Toast container — arka plana tıklanabilir kalsın (modal'a değil) */
+.gt-toast-container { pointer-events: none !important; }
+.gt-toast-container .swal2-toast,
+.gt-toast-container .swal2-popup { pointer-events: auto !important; }
+
+/* Başlık */
+.swal2-title {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: var(--gt-text) !important;
+    padding: 0.5rem 0 0.2rem !important;
+    letter-spacing: -0.01em !important;
+}
+
+/* HTML container (açıklama / form) */
+.swal2-html-container {
+    font-size: 0.92rem !important;
+    color: var(--gt-text-muted) !important;
+    margin: 0.5rem 0 1.3rem !important;
+    line-height: 1.5 !important;
+}
+
+/* Ikon (warning/success/error/info) */
+.swal2-icon {
+    margin: 1rem auto 0.5rem !important;
+    width: 4rem !important;
+    height: 4rem !important;
+    border-width: 3px !important;
+}
+
+.swal2-icon.swal2-warning {
+    color: var(--gt-bekliyor) !important;
+    border-color: var(--gt-bekliyor) !important;
+}
+.swal2-icon.swal2-success {
+    color: var(--gt-tamamlandi) !important;
+    border-color: var(--gt-tamamlandi) !important;
+}
+
+/* Butonlar — Bootstrap uyumlu yumuşak pill */
+.swal2-actions {
+    gap: 0.5rem !important;
+    margin-top: 1rem !important;
+}
+
+.swal2-styled {
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    font-size: 0.9rem !important;
+    padding: 0.55rem 1.3rem !important;
+    box-shadow: none !important;
+    transition: transform 0.1s ease, box-shadow 0.15s ease !important;
+}
+
+.swal2-styled:focus {
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2) !important;
+}
+
+.swal2-styled.swal2-confirm:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35) !important;
+}
+
+/* Input/textarea (yeni kategori modal'ında kullanılıyor) */
+.swal2-input,
+.swal2-textarea,
+.swal2-select {
+    border-radius: 8px !important;
+    border: 1px solid var(--gt-border) !important;
+    background: var(--gt-surface) !important;
+    color: var(--gt-text) !important;
+    padding: 0.55rem 0.85rem !important;
+    font-size: 0.95rem !important;
+    box-shadow: none !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.swal2-input:focus,
+.swal2-textarea:focus,
+.swal2-select:focus {
+    border-color: var(--gt-primary) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18) !important;
+}
+
+/* Toast (sağ üst bildirim) — daha kompakt ve şık */
+.swal2-toast {
+    border-radius: 12px !important;
+    padding: 0.75rem 1rem !important;
+    border: 1px solid var(--gt-border) !important;
+    background: var(--gt-surface) !important;
+    box-shadow:
+        0 4px 14px rgba(15, 23, 42, 0.1),
+        0 1px 3px rgba(15, 23, 42, 0.06) !important;
+    min-width: 280px !important;
+    max-width: 360px !important;
+}
+
+.swal2-toast .swal2-title {
+    color: var(--gt-text) !important;
+    font-size: 0.92rem !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.swal2-toast .swal2-icon {
+    width: 1.7rem !important;
+    height: 1.7rem !important;
+    border-width: 2px !important;
+    margin: 0 0.6rem 0 0 !important;
+}
+
+.swal2-toast .swal2-timer-progress-bar-container {
+    border-radius: 0 0 12px 12px !important;
+    overflow: hidden;
+    height: 3px !important;
+}
+
+.swal2-toast .swal2-timer-progress-bar {
+    background: var(--gt-primary) !important;
+}
+
+/* Validation mesajı (modal içinde hata) */
+.swal2-validation-message {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #b91c1c !important;
+    border-radius: 8px !important;
+    font-size: 0.85rem !important;
+    padding: 0.5rem 0.85rem !important;
+    margin-top: 0.5rem !important;
+}
+
+.swal2-validation-message::before {
+    background-color: #ef4444 !important;
+}
+
+/* Dark mode SweetAlert override (mevcut basit override'ları geliştir) */
+:root[data-tema="dark"] .swal2-popup {
+    background: var(--gt-surface) !important;
+    border-color: var(--gt-border) !important;
+    box-shadow:
+        0 30px 80px -10px rgba(0, 0, 0, 0.85),
+        0 15px 40px rgba(0, 0, 0, 0.5),
+        0 5px 15px rgba(0, 0, 0, 0.3),
+        0 1px 0 rgba(255, 255, 255, 0.1) inset !important;
+}
+
+:root[data-tema="dark"] .swal2-container,
+:root[data-tema="dark"] .swal2-container.swal2-backdrop-show {
+    background: transparent !important;
+}
+
+:root[data-tema="dark"] .swal2-title { color: var(--gt-text) !important; }
+:root[data-tema="dark"] .swal2-html-container { color: var(--gt-text-muted) !important; }
+
+:root[data-tema="dark"] .swal2-input,
+:root[data-tema="dark"] .swal2-textarea,
+:root[data-tema="dark"] .swal2-select {
+    background: var(--gt-bg) !important;
+    border-color: var(--gt-border) !important;
+    color: var(--gt-text) !important;
+}
+
+:root[data-tema="dark"] .swal2-toast {
+    background: var(--gt-surface) !important;
+    border-color: var(--gt-border) !important;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.05) inset,
+        0 6px 18px rgba(0, 0, 0, 0.35),
+        0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+:root[data-tema="dark"] .swal2-toast .swal2-title { color: var(--gt-text) !important; }
+
+:root[data-tema="dark"] .swal2-validation-message {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #fca5a5 !important;
 }
 
 /* ===== Empty state ===== */
