@@ -18,7 +18,11 @@ window.GorevTakip = (function () {
             showConfirmButton: false,
             timer: 3000,
             timerProgressBar: true,
-            customClass: { popup: 'shadow-sm' }
+            // Container'a özel class — backdrop/blur'u kesin kaldırmak için CSS targetlar
+            customClass: {
+                container: 'gt-toast-container',
+                popup: 'shadow-sm'
+            }
         });
     }
 
@@ -249,6 +253,76 @@ window.GorevTakip = (function () {
     document.addEventListener('DOMContentLoaded', function () {
         chipKontrastiniUygula();
     });
+
+    // Tema yönetimi — light/dark/auto, localStorage ile kalıcı
+    var TEMA_KEY = 'gt-tema';
+
+    function aktifTema() {
+        return localStorage.getItem(TEMA_KEY) || 'auto';
+    }
+
+    function uygulananTema() {
+        var t = aktifTema();
+        if (t === 'auto') {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return t;
+    }
+
+    function temayiUygula(tercih) {
+        try { localStorage.setItem(TEMA_KEY, tercih); } catch (e) {}
+        var efektif = (tercih === 'auto')
+            ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+            : tercih;
+        document.documentElement.setAttribute('data-tema', efektif);
+
+        // Toggle butonu ikonunu güncelle
+        var ikon = document.querySelector('.tema-ikon-aktif');
+        if (ikon) {
+            var sinifMap = {
+                'light': 'bi bi-sun-fill tema-ikon-aktif',
+                'dark': 'bi bi-moon-stars-fill tema-ikon-aktif',
+                'auto': 'bi bi-circle-half tema-ikon-aktif'
+            };
+            ikon.className = sinifMap[tercih] || sinifMap.auto;
+        }
+
+        // Aktif seçenek tikini güncelle
+        document.querySelectorAll('.tema-secenek').forEach(function (b) {
+            b.classList.toggle('aktif', b.dataset.tema === tercih);
+        });
+    }
+
+    function temaInit() {
+        // Mevcut tercih neyse ona göre toggle butonu ve tikleri güncelle
+        var mevcut = aktifTema();
+        var ikon = document.querySelector('.tema-ikon-aktif');
+        if (ikon) {
+            var sinifMap = {
+                'light': 'bi bi-sun-fill tema-ikon-aktif',
+                'dark': 'bi bi-moon-stars-fill tema-ikon-aktif',
+                'auto': 'bi bi-circle-half tema-ikon-aktif'
+            };
+            ikon.className = sinifMap[mevcut] || sinifMap.auto;
+        }
+        document.querySelectorAll('.tema-secenek').forEach(function (b) {
+            b.classList.toggle('aktif', b.dataset.tema === mevcut);
+            b.addEventListener('click', function () {
+                temayiUygula(b.dataset.tema);
+            });
+        });
+
+        // Auto seçiliyse sistem teması değişirse uygula
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+                if (aktifTema() === 'auto') {
+                    temayiUygula('auto');
+                }
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', temaInit);
 
     // Akıllı geri butonu — kullanıcı nereden geldiyse oraya döner.
     // Aynı site içinde referrer varsa history.back, yoksa fallback URL'e git.
