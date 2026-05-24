@@ -76,22 +76,50 @@
                     }
                 },
                 eventDidMount: function (info) {
-                    // Hover tooltip — durum + kategori bilgisi
                     var p = info.event.extendedProps;
+
+                    // Hover tooltip — durum + kategori bilgisi
                     var parts = [info.event.title];
                     if (p.durum) parts.push('Durum: ' + p.durum);
                     if (p.oncelik) parts.push('Öncelik: ' + p.oncelik);
                     if (p.kategoriAd) parts.push('Kategori: ' + p.kategoriAd);
                     info.el.setAttribute('title', parts.join(' · '));
+
+                    // Linear stili soft renklendirme: arkaplan rengin %15'i, text tam renk
+                    var ana = p.anaRenk || '#6366f1';
+                    var rgb = hexToRgb(ana);
+                    if (rgb) {
+                        info.el.style.background = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.13)';
+                        info.el.style.color = ana;
+                    }
+
+                    // Sol kenar şeridi: öncelik rengi
+                    if (p.oncelikRenk) {
+                        info.el.style.setProperty('--oncelik-renk', p.oncelikRenk);
+                    }
+
                     // Tamamlanmış görevlere üstü çizili efekti
                     if (p.durumKodu === 'Tamamlandi') {
                         info.el.style.textDecoration = 'line-through';
-                        info.el.style.opacity = '0.65';
+                        info.el.style.opacity = '0.6';
                     } else if (p.durumKodu === 'Iptal') {
-                        info.el.style.opacity = '0.5';
+                        info.el.style.opacity = '0.45';
                     }
                 }
             });
+
+            function hexToRgb(hex) {
+                if (!hex || hex.charAt(0) !== '#') return null;
+                var h = hex.length === 4
+                    ? hex.slice(1).split('').map(function (c) { return c + c; }).join('')
+                    : hex.slice(1);
+                return {
+                    r: parseInt(h.slice(0, 2), 16),
+                    g: parseInt(h.slice(2, 4), 16),
+                    b: parseInt(h.slice(4, 6), 16)
+                };
+            }
+
             takvim.render();
         });
     </script>

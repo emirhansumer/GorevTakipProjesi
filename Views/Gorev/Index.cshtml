@@ -5,6 +5,7 @@
     var kategoriler = ViewBag.Kategoriler as List<Kategori> ?? new List<Kategori>();
     var seciliKategoriId = ViewBag.SeciliKategoriId as int?;
     var kategorisizAktif = (bool)(ViewBag.Kategorisiz ?? false);
+    var aramaSorgusu = ViewBag.AramaSorgusu as string ?? "";
     ViewData["Title"] = baslik;
 
     var (emptyIcon, emptyText) = filtre switch
@@ -20,9 +21,23 @@
         <h2 class="mb-0">@baslik</h2>
         <p class="text-muted mb-0 small">@Model.Count() görev</p>
     </div>
-    <a asp-action="Create" class="btn btn-primary">
-        <i class="bi bi-plus-lg me-1"></i> Yeni Görev
-    </a>
+    <div class="d-flex align-items-center gap-2">
+        <form asp-action="Index" method="get" class="d-flex" role="search">
+            <div class="input-group input-group-sm" style="width:280px;">
+                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" value="@aramaSorgusu" class="form-control" placeholder="Görev başlığı veya açıklama..." autocomplete="off" />
+                @if (!string.IsNullOrWhiteSpace(aramaSorgusu))
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary" title="Aramayı temizle">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                }
+            </div>
+        </form>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> Yeni Görev
+        </a>
+    </div>
 </div>
 
 <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">

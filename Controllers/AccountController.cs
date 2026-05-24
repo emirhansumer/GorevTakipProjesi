@@ -51,8 +51,64 @@ public class AccountController : Controller
         _db.Kullanicilar.Add(kullanici);
         await _db.SaveChangesAsync();
 
+        // Yeni kullanıcıya örnek kategori + görevler ekle (boş ekran karşılamasın)
+        await OrnekVerileriOlustur(kullanici.Id);
+
         TempData["Mesaj"] = "Kayıt başarılı. Lütfen giriş yapın.";
         return RedirectToAction(nameof(Login));
+    }
+
+    private async Task OrnekVerileriOlustur(int kullaniciId)
+    {
+        var simdi = DateTime.Now;
+
+        var kategoriler = new[]
+        {
+            new Kategori { Ad = "Okul", Renk = "#0ea5e9", Ikon = "bi-book",      KullaniciId = kullaniciId, OlusturmaTarihi = simdi, Sira = 1 },
+            new Kategori { Ad = "İş",   Renk = "#f97316", Ikon = "bi-briefcase", KullaniciId = kullaniciId, OlusturmaTarihi = simdi, Sira = 2 },
+            new Kategori { Ad = "Spor", Renk = "#10b981", Ikon = "bi-trophy",    KullaniciId = kullaniciId, OlusturmaTarihi = simdi, Sira = 3 }
+        };
+        _db.Kategoriler.AddRange(kategoriler);
+        await _db.SaveChangesAsync();
+
+        var ornekGorevler = new[]
+        {
+            new Gorev
+            {
+                Baslik = "Hoş geldin! Sağ üstten yeni görev ekleyebilirsin",
+                Aciklama = "Bu örnek görevdir. Sil veya düzenle, kendi görevlerinle başla.",
+                BitisTarihi = simdi.AddDays(7),
+                Durum = GorevDurum.Bekliyor,
+                Oncelik = Oncelik.Orta,
+                OlusturmaTarihi = simdi,
+                KullaniciId = kullaniciId,
+                KategoriId = null
+            },
+            new Gorev
+            {
+                Baslik = "Dönem ödevini tamamla",
+                Aciklama = "Kaynak araştırması + giriş bölümü taslağı.",
+                BitisTarihi = simdi.AddDays(14),
+                Durum = GorevDurum.Bekliyor,
+                Oncelik = Oncelik.Yuksek,
+                OlusturmaTarihi = simdi,
+                KullaniciId = kullaniciId,
+                KategoriId = kategoriler[0].Id // Okul
+            },
+            new Gorev
+            {
+                Baslik = "Haftalık antrenman planı",
+                Aciklama = "Pazartesi-Çarşamba-Cuma yoğun, diğer günler dinlenme.",
+                BitisTarihi = simdi.AddDays(3),
+                Durum = GorevDurum.Bekliyor,
+                Oncelik = Oncelik.Dusuk,
+                OlusturmaTarihi = simdi,
+                KullaniciId = kullaniciId,
+                KategoriId = kategoriler[2].Id // Spor
+            }
+        };
+        _db.Gorevler.AddRange(ornekGorevler);
+        await _db.SaveChangesAsync();
     }
 
     [HttpGet]
