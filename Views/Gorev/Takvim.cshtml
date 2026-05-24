@@ -1,0 +1,76 @@
+@{
+    ViewData["Title"] = "Takvim";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h2 class="mb-0">
+            <i class="bi bi-calendar3 me-2 text-primary"></i> Görev Takvimi
+        </h2>
+        <p class="text-muted mb-0 small">Bitiş tarihi olan görevlerin aylık takvimi</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Yeni Görev
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div id="takvim"></div>
+    </div>
+</div>
+
+<div class="mt-3 text-muted small">
+    <i class="bi bi-info-circle me-1"></i>
+    Görevler bitiş tarihine göre yerleştirilir. Renk: kategori rengi (varsa) yoksa öncelik rengi.
+    Bir göreve tıklayarak detay sayfasına gidebilirsin.
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var el = document.getElementById('takvim');
+            if (!el || typeof FullCalendar === 'undefined') return;
+
+            var takvim = new FullCalendar.Calendar(el, {
+                initialView: 'dayGridMonth',
+                locale: 'tr',
+                firstDay: 1, // Pazartesi
+                height: 'auto',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,dayGridWeek,listMonth'
+                },
+                buttonText: {
+                    today: 'Bugün',
+                    month: 'Ay',
+                    week: 'Hafta',
+                    list: 'Liste'
+                },
+                events: '/Gorev/TakvimVerileri',
+                eventDisplay: 'block',
+                dayMaxEvents: 3,
+                moreLinkText: function (n) { return '+' + n + ' daha'; },
+                noEventsContent: 'Bu ayda bitiş tarihi olan görev yok.',
+                eventDidMount: function (info) {
+                    // Hover tooltip — durum + kategori bilgisi
+                    var p = info.event.extendedProps;
+                    var parts = [info.event.title];
+                    if (p.durum) parts.push('Durum: ' + p.durum);
+                    if (p.oncelik) parts.push('Öncelik: ' + p.oncelik);
+                    if (p.kategoriAd) parts.push('Kategori: ' + p.kategoriAd);
+                    info.el.setAttribute('title', parts.join(' · '));
+                    // Tamamlanmış görevlere üstü çizili efekti
+                    if (p.durumKodu === 'Tamamlandi') {
+                        info.el.style.textDecoration = 'line-through';
+                        info.el.style.opacity = '0.65';
+                    } else if (p.durumKodu === 'Iptal') {
+                        info.el.style.opacity = '0.5';
+                    }
+                }
+            });
+            takvim.render();
+        });
+    </script>
+}
