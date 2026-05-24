@@ -250,6 +250,18 @@ window.GorevTakip = (function () {
         chipKontrastiniUygula();
     });
 
+    // Akıllı geri butonu — kullanıcı nereden geldiyse oraya döner.
+    // Aynı site içinde referrer varsa history.back, yoksa fallback URL'e git.
+    function geriGit(fallbackUrl) {
+        var ref = document.referrer;
+        var sameOrigin = ref && ref.indexOf(window.location.origin) === 0;
+        if (sameOrigin && window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.location.href = fallbackUrl || '/';
+        }
+    }
+
     return {
         toast: toast,
         silOnayi: silOnayi,
@@ -257,6 +269,7 @@ window.GorevTakip = (function () {
         gorevKategoriDegistir: gorevKategoriDegistir,
         chipKontrastiniUygula: chipKontrastiniUygula,
         arkaPlanAcikMi: arkaPlanAcikMi,
+        geriGit: geriGit,
         csrfToken: csrfToken
     };
 })();
