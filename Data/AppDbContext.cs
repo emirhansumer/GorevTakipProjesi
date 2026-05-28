@@ -10,6 +10,7 @@ public class AppDbContext : DbContext
     public DbSet<Kullanici> Kullanicilar => Set<Kullanici>();
     public DbSet<Gorev> Gorevler => Set<Gorev>();
     public DbSet<Kategori> Kategoriler => Set<Kategori>();
+    public DbSet<AltGorev> AltGorevler => Set<AltGorev>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,6 +35,12 @@ public class AppDbContext : DbContext
             .WithMany(k => k.Gorevler)
             .HasForeignKey(g => g.KategoriId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<AltGorev>()
+            .HasOne(a => a.Gorev)
+            .WithMany(g => g.AltGorevler)
+            .HasForeignKey(a => a.GorevId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
     }

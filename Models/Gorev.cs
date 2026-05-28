@@ -37,4 +37,6 @@ public class Gorev
     public int? KategoriId { get; set; }
 
     public Kategori? Kategori { get; set; }
+
+    public ICollection<AltGorev> AltGorevler { get; set; } = new List<AltGorev>();
 }

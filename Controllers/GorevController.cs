@@ -151,6 +151,7 @@ public class GorevController : Controller
     {
         var gorev = await _db.Gorevler
             .Include(g => g.Kategori)
+            .Include(g => g.AltGorevler.OrderBy(a => a.Sira).ThenBy(a => a.Id))
             .FirstOrDefaultAsync(g => g.Id == id && g.KullaniciId == AktifKullaniciId);
 
         if (gorev is null)
@@ -333,6 +334,128 @@ public class GorevController : Controller
 
         TempData["Basari"] = "Görev silindi.";
         return RedirectToAction(nameof(Index));
+    }
+
+    // --- alt görevler (checklist) — AJAX endpoint'leri ---
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AltGorevEkle([FromForm] int gorevId, [FromForm] string metin)
+    {
+        metin = (metin ?? string.Empty).Trim();
+        if (metin.Length < 1 || metin.Length > 200)
+            return BadRequest(new { ok = false, message = "Madde 1-200 karakter olmalıdır." });
+
+        var gorev = await _db.Gorevler
+            .FirstOrDefaultAsync(g => g.Id == gorevId && g.KullaniciId == AktifKullaniciId);
+        if (gorev is null)
+            return NotFound(new { ok = false, message = "Görev bulunamadı." });
+
+        var sonrakiSira = (await _db.AltGorevler
+            .Where(a => a.GorevId == gorevId)
+            .Select(a => (int?)a.Sira)
+            .MaxAsync()) ?? 0;
+
+        var alt = new AltGorev
+        {
+            Metin = metin,
+            Tamamlandi = false,
+            Sira = sonrakiSira + 1,
+            GorevId = gorevId
+        };
+        _db.AltGorevler.Add(alt);
+        await _db.SaveChangesAsync();
+
+        return Json(new
+        {
+            ok = true,
+            id = alt.Id,
+            metin = alt.Metin,
+            tamamlandi = alt.Tamamlandi,
+            ilerleme = await AltGorevIlerlemesi(gorevId)
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AltGorevToggle([FromForm] int id)
+    {
+        var alt = await _db.AltGorevler
+            .Include(a => a.Gorev)
+            .FirstOrDefaultAsync(a => a.Id == id && a.Gorev!.KullaniciId == AktifKullaniciId);
+        if (alt is null)
+            return NotFound(new { ok = false, message = "Madde bulunamadı." });
+
+        alt.Tamamlandi = !alt.Tamamlandi;
+        await _db.SaveChangesAsync();
+
+        return Json(new
+        {
+            ok = true,
+            id = alt.Id,
+            tamamlandi = alt.Tamamlandi,
+            ilerleme = await AltGorevIlerlemesi(alt.GorevId)
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AltGorevSil([FromForm] int id)
+    {
+        var alt = await _db.AltGorevler
+            .Include(a => a.Gorev)
+            .FirstOrDefaultAsync(a => a.Id == id && a.Gorev!.KullaniciId == AktifKullaniciId);
+        if (alt is null)
+            return NotFound(new { ok = false, message = "Madde bulunamadı." });
+
+        var gorevId = alt.GorevId;
+        _db.AltGorevler.Remove(alt);
+        await _db.SaveChangesAsync();
+
+        return Json(new
+        {
+            ok = true,
+            id,
+            ilerleme = await AltGorevIlerlemesi(gorevId)
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AltGorevSirala([FromForm] int gorevId, [FromForm] int[] siraliIdler)
+    {
+        if (siraliIdler is null || siraliIdler.Length == 0)
+            return BadRequest(new { ok = false, message = "Boş liste." });
+
+        var gorev = await _db.Gorevler
+            .FirstOrDefaultAsync(g => g.Id == gorevId && g.KullaniciId == AktifKullaniciId);
+        if (gorev is null)
+            return NotFound(new { ok = false, message = "Görev bulunamadı." });
+
+        var altlar = await _db.AltGorevler
+            .Where(a => a.GorevId == gorevId && siraliIdler.Contains(a.Id))
+            .ToListAsync();
+
+        // Güvenlik: gelen tüm id'lerin gerçekten bu göreve ait olduğunu doğrula
+        if (altlar.Count != siraliIdler.Length)
+            return BadRequest(new { ok = false, message = "Bazı maddeler size ait değil." });
+
+        for (int i = 0; i < siraliIdler.Length; i++)
+        {
+            var a = altlar.First(x => x.Id == siraliIdler[i]);
+            a.Sira = i + 1;
+        }
+        await _db.SaveChangesAsync();
+
+        return Json(new { ok = true, count = siraliIdler.Length });
+    }
+
+    private async Task<object> AltGorevIlerlemesi(int gorevId)
+    {
+        var toplam = await _db.AltGorevler.CountAsync(a => a.GorevId == gorevId);
+        var tamamlanan = await _db.AltGorevler.CountAsync(a => a.GorevId == gorevId && a.Tamamlandi);
+        var yuzde = toplam == 0 ? 0 : (int)Math.Round((double)tamamlanan * 100 / toplam);
+        return new { toplam, tamamlanan, yuzde };
     }
 
     // --- yardımcı metotlar ---
