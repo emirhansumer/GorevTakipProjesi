@@ -1,6 +1,9 @@
 @model Gorev
 @{
     ViewData["Title"] = "Görev Detayı";
+    var altToplam = Model.AltGorevler.Count;
+    var altTamamlanan = Model.AltGorevler.Count(a => a.Tamamlandi);
+    var altYuzde = altToplam == 0 ? 0 : (int)Math.Round((double)altTamamlanan * 100 / altToplam);
 }
 
 <div class="d-flex align-items-center mb-3">
@@ -72,6 +75,52 @@
                     {
                         <div class="bg-light rounded-3 p-3" style="white-space:pre-wrap;">@Model.Aciklama</div>
                     }
+                </div>
+
+                <hr class="my-4">
+
+                <div class="alt-gorev-bolumu" data-gorev-id="@Model.Id">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="text-muted small text-uppercase fw-semibold">
+                            <i class="bi bi-list-check me-1"></i> Alt Görevler
+                        </div>
+                        <span class="alt-gorev-sayac badge rounded-pill @(altToplam > 0 && altTamamlanan == altToplam ? "tamam" : "")">
+                            <span class="ag-tamamlanan">@altTamamlanan</span> / <span class="ag-toplam">@altToplam</span>
+                        </span>
+                    </div>
+
+                    <div class="alt-gorev-progress mb-3 @(altToplam == 0 ? "d-none" : "")">
+                        <div class="alt-gorev-progress-bar" style="width:@altYuzde%"></div>
+                    </div>
+
+                    <ul class="alt-gorev-listesi" id="altGorevListesi">
+                        @foreach (var alt in Model.AltGorevler)
+                        {
+                            <li class="alt-gorev-madde @(alt.Tamamlandi ? "tamamlandi" : "")" data-alt-id="@alt.Id">
+                                <span class="ag-tut" title="Sürükle"><i class="bi bi-grip-vertical"></i></span>
+                                <label class="ag-check">
+                                    <input type="checkbox" @(alt.Tamamlandi ? "checked" : "") />
+                                    <span class="ag-kutu"><i class="bi bi-check-lg"></i></span>
+                                </label>
+                                <span class="ag-metin">@alt.Metin</span>
+                                <button type="button" class="ag-sil" title="Sil"><i class="bi bi-x-lg"></i></button>
+                            </li>
+                        }
+                    </ul>
+
+                    <div class="alt-gorev-bos @(altToplam > 0 ? "d-none" : "")">
+                        <i class="bi bi-check2-square"></i>
+                        <span>Henüz alt görev yok. Aşağıdan madde ekleyebilirsin.</span>
+                    </div>
+
+                    <div class="input-group alt-gorev-ekle mt-2">
+                        <span class="input-group-text"><i class="bi bi-plus-lg"></i></span>
+                        <input type="text" class="form-control alt-gorev-input" maxlength="200"
+                               placeholder="Yeni madde yaz ve Enter'a bas…" autocomplete="off" />
+                        <button type="button" class="btn btn-primary alt-gorev-ekle-btn">
+                            <i class="bi bi-plus-lg d-sm-none"></i><span class="d-none d-sm-inline">Ekle</span>
+                        </button>
+                    </div>
                 </div>
 
                 <hr class="my-4">

@@ -169,6 +169,36 @@ else
                                         @gorev.Aciklama
                                     </div>
                                 }
+                                @{
+                                    var altToplam = gorev.AltGorevler.Count;
+                                    var altTamam = gorev.AltGorevler.Count(a => a.Tamamlandi);
+                                    var altYuzde = altToplam == 0 ? 0 : (int)Math.Round((double)altTamam * 100 / altToplam);
+                                }
+                                @if (altToplam > 0)
+                                {
+                                    <div class="gorev-alt-ozet @(altTamam == altToplam ? "tamam" : "")" tabindex="0">
+                                        <i class="bi bi-list-check"></i>
+                                        <span class="gorev-alt-bar">
+                                            <span class="gorev-alt-bar-dolu" style="width:@altYuzde%"></span>
+                                        </span>
+                                        <span class="gorev-alt-sayi">@altTamam/@altToplam</span>
+                                        <div class="gorev-alt-popover" role="tooltip">
+                                            <div class="gorev-alt-popover-baslik">
+                                                <i class="bi bi-list-check"></i>
+                                                Alt görevler · @altTamam/@altToplam
+                                            </div>
+                                            <ul class="gorev-alt-popover-liste">
+                                                @foreach (var alt in gorev.AltGorevler.OrderBy(a => a.Sira).ThenBy(a => a.Id))
+                                                {
+                                                    <li class="@(alt.Tamamlandi ? "tamam" : "")">
+                                                        <i class="bi @(alt.Tamamlandi ? "bi-check-circle-fill" : "bi-circle")"></i>
+                                                        <span>@alt.Metin</span>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                }
                             </td>
                             <td class="tablo-kategori-sutun">
                                 <button type="button"
@@ -313,6 +343,26 @@ else
                 if (e.key === 'Escape' && document.activeElement === input) {
                     input.blur();
                 }
+            });
+        })();
+    </script>
+    <script>
+        // Alt görev popover'ı: tablonun üst satırlarında yukarıda yer kalmazsa aşağı çevir.
+        // table-responsive overflow'u taşmayı kırptığı için yön ayarı şart.
+        (function () {
+            function yonAyarla(oz) {
+                var kapsayici = oz.closest('.table-responsive');
+                if (!kapsayici) return;
+                var ozUst = oz.getBoundingClientRect().top - kapsayici.getBoundingClientRect().top;
+                oz.classList.toggle('alt-acilir-asagi', ozUst < 180);
+            }
+            document.addEventListener('mouseover', function (e) {
+                var oz = e.target.closest('.gorev-alt-ozet');
+                if (oz) yonAyarla(oz);
+            });
+            document.addEventListener('focusin', function (e) {
+                var oz = e.target.closest('.gorev-alt-ozet');
+                if (oz) yonAyarla(oz);
             });
         })();
     </script>

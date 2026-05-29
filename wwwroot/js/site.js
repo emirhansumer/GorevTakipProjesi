@@ -336,6 +336,178 @@ window.GorevTakip = (function () {
         }
     }
 
+    // --- Alt görevler (checklist) — Görev Detay sayfası ---
+
+    // POST yardımcısı: CSRF token ekler, JSON cevabı normalize eder
+    function altGorevPost(url, formData) {
+        formData.append('__RequestVerificationToken', csrfToken());
+        return fetch(url, { method: 'POST', body: formData, credentials: 'same-origin' })
+            .then(function (r) {
+                return r.json().then(function (d) { return { ok: r.ok, data: d }; });
+            });
+    }
+
+    // İlerleme göstergesini (sayaç, progress bar, boş durum) günceller
+    function altGorevIlerlemeyiUygula(bolum, ilerleme) {
+        if (!bolum || !ilerleme) return;
+        var tamamlananEl = bolum.querySelector('.ag-tamamlanan');
+        var toplamEl = bolum.querySelector('.ag-toplam');
+        var progress = bolum.querySelector('.alt-gorev-progress');
+        var bar = bolum.querySelector('.alt-gorev-progress-bar');
+        var bos = bolum.querySelector('.alt-gorev-bos');
+        var sayac = bolum.querySelector('.alt-gorev-sayac');
+
+        if (tamamlananEl) tamamlananEl.textContent = ilerleme.tamamlanan;
+        if (toplamEl) toplamEl.textContent = ilerleme.toplam;
+        if (bar) bar.style.width = ilerleme.yuzde + '%';
+        if (progress) progress.classList.toggle('d-none', ilerleme.toplam === 0);
+        if (bos) bos.classList.toggle('d-none', ilerleme.toplam > 0);
+        if (sayac) sayac.classList.toggle('tamam', ilerleme.toplam > 0 && ilerleme.tamamlanan === ilerleme.toplam);
+    }
+
+    // Yeni bir alt görev <li>'si oluşturur (metin textContent ile — XSS güvenli)
+    function altGorevMaddeOlustur(id, metin, tamamlandi) {
+        var li = document.createElement('li');
+        li.className = 'alt-gorev-madde' + (tamamlandi ? ' tamamlandi' : '');
+        li.dataset.altId = id;
+
+        var tut = document.createElement('span');
+        tut.className = 'ag-tut';
+        tut.title = 'Sürükle';
+        tut.innerHTML = '<i class="bi bi-grip-vertical"></i>';
+
+        var label = document.createElement('label');
+        label.className = 'ag-check';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !!tamamlandi;
+        var kutu = document.createElement('span');
+        kutu.className = 'ag-kutu';
+        kutu.innerHTML = '<i class="bi bi-check-lg"></i>';
+        label.appendChild(cb);
+        label.appendChild(kutu);
+
+        var metinEl = document.createElement('span');
+        metinEl.className = 'ag-metin';
+        metinEl.textContent = metin;
+
+        var sil = document.createElement('button');
+        sil.type = 'button';
+        sil.className = 'ag-sil';
+        sil.title = 'Sil';
+        sil.innerHTML = '<i class="bi bi-x-lg"></i>';
+
+        li.appendChild(tut);
+        li.appendChild(label);
+        li.appendChild(metinEl);
+        li.appendChild(sil);
+        return li;
+    }
+
+    function altGorevleriBaslat() {
+        var bolum = document.querySelector('.alt-gorev-bolumu');
+        var liste = document.getElementById('altGorevListesi');
+        if (!bolum || !liste) return;
+
+        var gorevId = bolum.dataset.gorevId;
+        var input = bolum.querySelector('.alt-gorev-input');
+        var ekleBtn = bolum.querySelector('.alt-gorev-ekle-btn');
+
+        function ekle() {
+            var metin = (input.value || '').trim();
+            if (metin.length < 1) { input.focus(); return; }
+            if (metin.length > 200) { toast('warning', 'En fazla 200 karakter olabilir'); return; }
+            ekleBtn.disabled = true;
+            var fd = new FormData();
+            fd.append('gorevId', gorevId);
+            fd.append('metin', metin);
+            altGorevPost('/Gorev/AltGorevEkle', fd).then(function (res) {
+                ekleBtn.disabled = false;
+                if (!res.ok || !res.data.ok) { toast('error', res.data.message || 'Eklenemedi'); return; }
+                liste.appendChild(altGorevMaddeOlustur(res.data.id, res.data.metin, res.data.tamamlandi));
+                altGorevIlerlemeyiUygula(bolum, res.data.ilerleme);
+                input.value = '';
+                input.focus();
+            }).catch(function () { ekleBtn.disabled = false; toast('error', 'Sunucu hatası'); });
+        }
+
+        ekleBtn.addEventListener('click', ekle);
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); ekle(); }
+        });
+
+        // Checkbox toggle — optimistik (anında işaretle, hata olursa geri al)
+        liste.addEventListener('change', function (e) {
+            var cb = e.target.closest('input[type="checkbox"]');
+            if (!cb) return;
+            var li = cb.closest('.alt-gorev-madde');
+            if (!li) return;
+            li.classList.toggle('tamamlandi', cb.checked);
+            var fd = new FormData();
+            fd.append('id', li.dataset.altId);
+            altGorevPost('/Gorev/AltGorevToggle', fd).then(function (res) {
+                if (!res.ok || !res.data.ok) {
+                    cb.checked = !cb.checked;
+                    li.classList.toggle('tamamlandi', cb.checked);
+                    toast('error', res.data.message || 'Güncellenemedi');
+                    return;
+                }
+                cb.checked = res.data.tamamlandi;
+                li.classList.toggle('tamamlandi', res.data.tamamlandi);
+                altGorevIlerlemeyiUygula(bolum, res.data.ilerleme);
+            }).catch(function () {
+                cb.checked = !cb.checked;
+                li.classList.toggle('tamamlandi', cb.checked);
+                toast('error', 'Sunucu hatası');
+            });
+        });
+
+        // Sil
+        liste.addEventListener('click', function (e) {
+            var sil = e.target.closest('.ag-sil');
+            if (!sil) return;
+            var li = sil.closest('.alt-gorev-madde');
+            if (!li) return;
+            var fd = new FormData();
+            fd.append('id', li.dataset.altId);
+            li.classList.add('cikis');
+            altGorevPost('/Gorev/AltGorevSil', fd).then(function (res) {
+                if (!res.ok || !res.data.ok) {
+                    li.classList.remove('cikis');
+                    toast('error', res.data.message || 'Silinemedi');
+                    return;
+                }
+                setTimeout(function () { if (li.parentNode) li.remove(); }, 200);
+                altGorevIlerlemeyiUygula(bolum, res.data.ilerleme);
+            }).catch(function () {
+                li.classList.remove('cikis');
+                toast('error', 'Sunucu hatası');
+            });
+        });
+
+        // Sürükle-bırak sıralama (SortableJS)
+        if (window.Sortable) {
+            Sortable.create(liste, {
+                handle: '.ag-tut',
+                animation: 150,
+                ghostClass: 'ag-ghost',
+                onEnd: function () {
+                    var idler = Array.prototype.map.call(
+                        liste.querySelectorAll('.alt-gorev-madde'),
+                        function (el) { return el.dataset.altId; });
+                    var fd = new FormData();
+                    fd.append('gorevId', gorevId);
+                    idler.forEach(function (id) { fd.append('siraliIdler', id); });
+                    altGorevPost('/Gorev/AltGorevSirala', fd).then(function (res) {
+                        if (!res.ok || !res.data.ok) toast('error', 'Sıralama kaydedilemedi');
+                    });
+                }
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', altGorevleriBaslat);
+
     return {
         toast: toast,
         silOnayi: silOnayi,
