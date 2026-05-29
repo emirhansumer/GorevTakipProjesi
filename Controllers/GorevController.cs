@@ -73,6 +73,7 @@ public class GorevController : Controller
     {
         var sorgu = _db.Gorevler
             .Include(g => g.Kategori)
+            .Include(g => g.AltGorevler)
             .Where(g => g.KullaniciId == AktifKullaniciId && g.BitisTarihi.HasValue);
 
         if (start.HasValue)
@@ -106,7 +107,9 @@ public class GorevController : Controller
                     kategoriRenk = g.Kategori?.Renk,
                     oncelik = g.Oncelik.Etiket(),
                     oncelikRenk = oncelikRenk,
-                    anaRenk = anaRenk
+                    anaRenk = anaRenk,
+                    altToplam = g.AltGorevler.Count,
+                    altTamam = g.AltGorevler.Count(a => a.Tamamlandi)
                 }
             };
         });
@@ -164,6 +167,7 @@ public class GorevController : Controller
     {
         var sorgu = _db.Gorevler
             .Include(g => g.Kategori)
+            .Include(g => g.AltGorevler)
             .Where(g => g.KullaniciId == AktifKullaniciId);
 
         if (durum.HasValue)

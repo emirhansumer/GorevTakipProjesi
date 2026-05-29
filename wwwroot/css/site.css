@@ -1484,6 +1484,39 @@ dl.row dt {
     display: block;
 }
 
+/* Alt görevi olan etkinliklerde mini "2/4" rozeti */
+.takvim-alt-rozet {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-left: 6px;
+    padding: 0 5px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+    background: rgba(99, 102, 241, 0.16);
+    color: inherit;
+    white-space: nowrap;
+}
+
+.takvim-alt-rozet > .bi {
+    font-size: 0.68rem;
+    line-height: 1;
+}
+
+.takvim-alt-rozet.tamam {
+    background: var(--gt-tamamlandi-bg);
+    color: var(--gt-tamamlandi);
+}
+
+/* Liste görünümünde başlığın yanında dursun */
+.fc .fc-list-event-title .takvim-alt-rozet {
+    color: var(--gt-text-muted);
+}
+
 /* "all-day" yazısı eğer hala görünüyorsa gizle */
 .fc .fc-daygrid-event .fc-event-time:empty,
 .fc .fc-list-event-time {
@@ -1927,6 +1960,186 @@ dl.row dt {
 
 .alt-gorev-sayac.tamam {
     background: var(--gt-tamamlandi-bg);
+    color: var(--gt-tamamlandi);
+}
+
+/* Görev listesi satırındaki kompakt alt görev ilerlemesi */
+.gorev-alt-ozet {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 6px;
+    font-size: 0.78rem;
+    color: var(--gt-text-muted);
+    cursor: default;
+}
+
+.gorev-alt-ozet > .bi {
+    flex: 0 0 auto;
+    font-size: 0.9rem;
+    color: var(--gt-primary);
+    line-height: 1;
+}
+
+.gorev-alt-bar {
+    display: inline-block;
+    width: 84px;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--gt-bg);
+    border: 1px solid var(--gt-border);
+    overflow: hidden;
+}
+
+.gorev-alt-bar-dolu {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--gt-primary) 0%, var(--gt-tamamlandi) 100%);
+    transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gorev-alt-sayi {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--gt-primary-light);
+    color: var(--gt-primary-dark);
+}
+
+.gorev-alt-ozet.tamam > .bi {
+    color: var(--gt-tamamlandi);
+}
+
+.gorev-alt-ozet.tamam .gorev-alt-sayi {
+    background: var(--gt-tamamlandi-bg);
+    color: var(--gt-tamamlandi);
+}
+
+/* Hover popover — alt görev maddelerinin içeriğini gösterir */
+.gorev-alt-popover {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 0;
+    z-index: 60;
+    min-width: 230px;
+    max-width: 320px;
+    padding: 10px 12px;
+    background: var(--gt-surface);
+    border: 1px solid var(--gt-border);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+    pointer-events: none;
+    text-align: left;
+    white-space: normal;
+}
+
+/* Küçük ok ucu (popover'ı tetikleyiciye bağlar) */
+.gorev-alt-popover::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 16px;
+    width: 10px;
+    height: 10px;
+    margin-top: -5px;
+    background: var(--gt-surface);
+    border-right: 1px solid var(--gt-border);
+    border-bottom: 1px solid var(--gt-border);
+    transform: rotate(45deg);
+}
+
+.gorev-alt-ozet:hover .gorev-alt-popover,
+.gorev-alt-ozet:focus-within .gorev-alt-popover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Üstte yer yoksa (tablonun ilk satırları) aşağı açılır — JS ekler */
+.gorev-alt-ozet.alt-acilir-asagi .gorev-alt-popover {
+    bottom: auto;
+    top: calc(100% + 10px);
+    transform: translateY(-6px);
+}
+
+.gorev-alt-ozet.alt-acilir-asagi .gorev-alt-popover::after {
+    top: auto;
+    bottom: 100%;
+    margin-top: 0;
+    margin-bottom: -5px;
+    border-right: none;
+    border-bottom: none;
+    border-left: 1px solid var(--gt-border);
+    border-top: 1px solid var(--gt-border);
+}
+
+.gorev-alt-ozet.alt-acilir-asagi:hover .gorev-alt-popover,
+.gorev-alt-ozet.alt-acilir-asagi:focus-within .gorev-alt-popover {
+    transform: translateY(0);
+}
+
+.gorev-alt-popover-baslik {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--gt-text-muted);
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--gt-border);
+}
+
+.gorev-alt-popover-baslik > .bi {
+    color: var(--gt-primary);
+    font-size: 0.85rem;
+}
+
+.gorev-alt-popover-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.gorev-alt-popover-liste li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    color: var(--gt-text);
+}
+
+.gorev-alt-popover-liste li > .bi {
+    flex: 0 0 auto;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    color: var(--gt-text-muted);
+}
+
+.gorev-alt-popover-liste li.tamam {
+    color: var(--gt-text-muted);
+}
+
+.gorev-alt-popover-liste li.tamam > span {
+    text-decoration: line-through;
+    text-decoration-color: var(--gt-text-muted);
+}
+
+.gorev-alt-popover-liste li.tamam > .bi {
     color: var(--gt-tamamlandi);
 }
 

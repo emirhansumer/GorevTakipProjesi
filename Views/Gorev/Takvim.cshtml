@@ -83,7 +83,18 @@
                     if (p.durum) parts.push('Durum: ' + p.durum);
                     if (p.oncelik) parts.push('Öncelik: ' + p.oncelik);
                     if (p.kategoriAd) parts.push('Kategori: ' + p.kategoriAd);
+                    if (p.altToplam > 0) parts.push('Alt görev: ' + p.altTamam + '/' + p.altToplam);
                     info.el.setAttribute('title', parts.join(' · '));
+
+                    // Alt görevi olan etkinliklere mini "2/4" rozeti
+                    if (p.altToplam > 0) {
+                        var rozet = document.createElement('span');
+                        rozet.className = 'takvim-alt-rozet' + (p.altTamam === p.altToplam ? ' tamam' : '');
+                        rozet.innerHTML = '<i class="bi bi-list-check"></i>' + p.altTamam + '/' + p.altToplam;
+                        var hedef = info.el.querySelector('.fc-event-main-frame') ||
+                                    info.el.querySelector('.fc-list-event-title');
+                        if (hedef) hedef.appendChild(rozet);
+                    }
 
                     // Linear stili soft renklendirme: arkaplan rengin %15'i, text tam renk
                     var ana = p.anaRenk || '#6366f1';
