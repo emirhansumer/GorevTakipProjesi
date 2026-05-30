@@ -1,0 +1,123 @@
+@model AdminGorevlerViewModel
+@{
+    ViewData["Title"] = "Tüm Görevler";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-list-task me-2 text-primary"></i> Tüm Görevler</h2>
+        <p class="text-muted mb-0 small">Sistemdeki @Model.Gorevler.Count görev</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Admin Paneli
+    </a>
+</div>
+
+<form asp-action="Gorevler" method="get" class="card shadow-sm mb-3">
+    <div class="card-body d-flex flex-wrap gap-2 align-items-center">
+        <span class="text-muted small me-1"><i class="bi bi-funnel me-1"></i>Filtre:</span>
+        <select name="kullaniciId" class="form-select w-auto" onchange="this.form.submit()">
+            <option value="">Tüm kullanıcılar</option>
+            @foreach (var k in Model.Kullanicilar)
+            {
+                <option value="@k.Id" selected="@(Model.SeciliKullaniciId == k.Id)">@k.AdSoyad</option>
+            }
+        </select>
+        <select name="durum" class="form-select w-auto" onchange="this.form.submit()">
+            <option value="">Tüm durumlar</option>
+            @foreach (var d in Enum.GetValues<GorevDurum>())
+            {
+                <option value="@d" selected="@(Model.SeciliDurum == d)">@d.Etiket()</option>
+            }
+        </select>
+        @if (Model.SeciliDurum.HasValue || Model.SeciliKullaniciId.HasValue)
+        {
+            <a asp-action="Gorevler" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-x-lg me-1"></i> Temizle
+            </a>
+        }
+    </div>
+</form>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Görev</th>
+                    <th>Sahibi</th>
+                    <th>Kategori</th>
+                    <th>Öncelik</th>
+                    <th>Durum</th>
+                    <th>Bitiş</th>
+                    <th class="text-end">İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Gorevler.Any())
+                {
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state"><i class="bi bi-clipboard-x empty-icon"></i><p class="mb-0">Bu filtreyle görev yok.</p></div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var gorev in Model.Gorevler)
+                    {
+                        <tr>
+                            <td>
+                                <span class="fw-semibold">@gorev.Baslik</span>
+                                @if (!string.IsNullOrWhiteSpace(gorev.Aciklama))
+                                {
+                                    <div class="text-muted small text-truncate" style="max-width:320px;">@gorev.Aciklama</div>
+                                }
+                            </td>
+                            <td>
+                                <span class="text-muted small">
+                                    <i class="bi bi-person me-1"></i>@(gorev.Kullanici?.AdSoyad ?? "—")
+                                </span>
+                            </td>
+                            <td>
+                                @if (gorev.Kategori is not null)
+                                {
+                                    <span class="kategori-chip @RenkHelper.ChipKoyuClass(gorev.Kategori.Renk)" style="background:@gorev.Kategori.Renk;">
+                                        @Html.KategoriIkon(gorev.Kategori.Ikon)
+                                        <span>@gorev.Kategori.Ad</span>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small fst-italic">Kategorisiz</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge oncelik-badge @gorev.Oncelik.CssClass()">
+                                    <i class="bi @gorev.Oncelik.Ikon() me-1"></i>@gorev.Oncelik.Etiket()
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge @gorev.Durum.CssClass()">
+                                    <i class="bi @gorev.Durum.Ikon() me-1"></i>@gorev.Durum.Etiket()
+                                </span>
+                            </td>
+                            <td class="text-muted small">
+                                @(gorev.BitisTarihi?.ToString("dd.MM.yyyy") ?? "—")
+                            </td>
+                            <td class="text-end">
+                                <button type="button" class="btn btn-sm btn-outline-danger" title="Görevi sil"
+                                        onclick="GorevTakip.silOnayi('admin-gorev-sil-@gorev.Id', { text: '@Html.Raw(Html.Encode(gorev.Baslik)) görevi silinecek. Emin misin?' })">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <form id="admin-gorev-sil-@gorev.Id" asp-action="GorevSil" asp-route-id="@gorev.Id" method="post" class="d-none">
+                                    @Html.AntiForgeryToken()
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

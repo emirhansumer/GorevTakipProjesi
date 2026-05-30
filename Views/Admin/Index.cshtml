@@ -1,0 +1,150 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Paneli";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h2 class="mb-0">
+            <i class="bi bi-shield-lock-fill me-2 text-primary"></i> Admin Paneli
+        </h2>
+        <p class="text-muted mb-0">Sistem geneli özet ve yönetim.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Kullanicilar" class="btn btn-outline-primary">
+            <i class="bi bi-people me-1"></i> Kullanıcılar
+        </a>
+        <a asp-action="Gorevler" class="btn btn-outline-primary">
+            <i class="bi bi-list-task me-1"></i> Tüm Görevler
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card stat-toplam h-100">
+            <div class="card-body">
+                <div class="stat-label">Kullanıcı</div>
+                <div class="stat-value">@Model.ToplamKullanici</div>
+                <i class="bi bi-people-fill stat-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card stat-bekleyen h-100">
+            <div class="card-body">
+                <div class="stat-label">Görev</div>
+                <div class="stat-value">@Model.ToplamGorev</div>
+                <i class="bi bi-list-check stat-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card stat-tamamlanan h-100">
+            <div class="card-body">
+                <div class="stat-label">Kategori</div>
+                <div class="stat-value">@Model.ToplamKategori</div>
+                <i class="bi bi-bookmarks-fill stat-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card stat-iptal h-100">
+            <div class="card-body">
+                <div class="stat-label">Alt Görev</div>
+                <div class="stat-value">@Model.ToplamAltGorev</div>
+                <i class="bi bi-check2-square stat-icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <span class="fw-semibold"><i class="bi bi-pie-chart me-1 text-primary"></i> Görev Durum Dağılımı</span>
+    </div>
+    <div class="card-body">
+        <div class="row g-3 text-center">
+            <div class="col-4">
+                <div class="badge @GorevDurum.Bekliyor.CssClass() fs-6 d-block py-2">
+                    <i class="bi @GorevDurum.Bekliyor.Ikon() me-1"></i> Bekleyen: @Model.BekleyenGorev
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="badge @GorevDurum.Tamamlandi.CssClass() fs-6 d-block py-2">
+                    <i class="bi @GorevDurum.Tamamlandi.Ikon() me-1"></i> Tamamlanan: @Model.TamamlananGorev
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="badge @GorevDurum.Iptal.CssClass() fs-6 d-block py-2">
+                    <i class="bi @GorevDurum.Iptal.Ikon() me-1"></i> İptal: @Model.IptalGorev
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-12 col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-semibold"><i class="bi bi-trophy me-1 text-primary"></i> En Aktif Kullanıcılar</span>
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.EnAktifKullanicilar.Any())
+                {
+                    <div class="empty-state"><i class="bi bi-people empty-icon"></i><p class="mb-0">Henüz görevi olan kullanıcı yok.</p></div>
+                }
+                else
+                {
+                    <table class="table mb-0 align-middle">
+                        <tbody>
+                            @foreach (var ozet in Model.EnAktifKullanicilar)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="fw-semibold">@ozet.Kullanici.AdSoyad</span>
+                                        <div class="text-muted small">@ozet.Kullanici.Email</div>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="badge bg-primary"><i class="bi bi-list-check me-1"></i>@ozet.GorevSayisi görev</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-semibold"><i class="bi bi-person-plus me-1 text-primary"></i> Son Kayıt Olanlar</span>
+                <a asp-action="Kullanicilar" class="small text-decoration-none">Tümü <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0 align-middle">
+                    <tbody>
+                        @foreach (var ozet in Model.SonKullanicilar)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="fw-semibold">@ozet.Kullanici.AdSoyad</span>
+                                    @if (ozet.Kullanici.IsAdmin)
+                                    {
+                                        <span class="badge bg-primary ms-1"><i class="bi bi-shield-fill"></i> Admin</span>
+                                    }
+                                    <div class="text-muted small">@ozet.Kullanici.Email</div>
+                                </td>
+                                <td class="text-end text-muted small">
+                                    <i class="bi bi-clock me-1"></i>@ozet.Kullanici.KayitTarihi.ToString("dd.MM.yyyy")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

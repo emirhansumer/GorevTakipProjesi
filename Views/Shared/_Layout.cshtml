@@ -6,6 +6,7 @@
     var session = HttpContextAccessor.HttpContext?.Session;
     var girisYapildi = session?.GirisYapildiMi() ?? false;
     var adSoyad = session?.GetAdSoyad();
+    var admin = session?.AdminMi() ?? false;
     var routeData = ViewContext.RouteData.Values;
     var aktifController = routeData["controller"]?.ToString();
     var aktifAction = routeData["action"]?.ToString();
@@ -90,6 +91,14 @@
                                     <i class="bi bi-bookmarks me-1"></i> Kategorilerim
                                 </a>
                             </li>
+                            @if (admin)
+                            {
+                                <li class="nav-item">
+                                    <a class="@NavClass("Admin")" asp-controller="Admin" asp-action="Index">
+                                        <i class="bi bi-shield-lock me-1"></i> Admin
+                                    </a>
+                                </li>
+                            }
                         }
                     </ul>
                     <ul class="navbar-nav align-items-lg-center">

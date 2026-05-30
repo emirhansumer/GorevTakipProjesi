@@ -136,7 +136,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        HttpContext.Session.GirisYap(kullanici.Id, kullanici.AdSoyad, kullanici.Email);
+        HttpContext.Session.GirisYap(kullanici.Id, kullanici.AdSoyad, kullanici.Email, kullanici.IsAdmin);
         return RedirectToAction("Index", "Home");
     }
 
