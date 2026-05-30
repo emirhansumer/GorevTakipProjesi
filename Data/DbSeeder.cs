@@ -20,7 +20,7 @@ public static class DbSeeder
         {
             db.Kullanicilar.Add(new Kullanici
             {
-                AdSoyad = "Sistem Yöneticisi",
+                AdSoyad = "Emir Sümer",
                 Email = AdminEmail,
                 SifreHash = BCrypt.Net.BCrypt.HashPassword(AdminSifre),
                 IsAdmin = true,

@@ -241,8 +241,8 @@ public class AdminController : Controller
         await _db.SaveChangesAsync();
 
         TempData["Basari"] = kullanici.IsAdmin
-            ? $"\"{kullanici.AdSoyad}\" artık admin."
-            : $"\"{kullanici.AdSoyad}\" kullanıcısının admin yetkisi kaldırıldı.";
+            ? $"\"{kullanici.AdSoyad}\" artık sistem yöneticisi."
+            : $"\"{kullanici.AdSoyad}\" kullanıcısının yöneticilik yetkisi kaldırıldı.";
         return RedirectToAction(nameof(Kullanicilar));
     }
 
