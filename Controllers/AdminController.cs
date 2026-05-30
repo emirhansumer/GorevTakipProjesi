@@ -1,3 +1,4 @@
+using System.Text;
 using GorevTakip.Data;
 using GorevTakip.Filters;
 using GorevTakip.Helpers;
@@ -57,10 +58,18 @@ public class AdminController : Controller
         return View(model);
     }
 
-    // Tüm kullanıcılar — görev/kategori sayılarıyla
-    public async Task<IActionResult> Kullanicilar()
+    // Tüm kullanıcılar — görev/kategori sayılarıyla + arama
+    public async Task<IActionResult> Kullanicilar(string? q)
     {
-        var liste = await _db.Kullanicilar
+        var sorgu = _db.Kullanicilar.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(q))
+        {
+            var ara = q.Trim().ToLower();
+            sorgu = sorgu.Where(k => k.AdSoyad.ToLower().Contains(ara) || k.Email.ToLower().Contains(ara));
+        }
+
+        var liste = await sorgu
             .OrderByDescending(k => k.IsAdmin)
             .ThenBy(k => k.AdSoyad)
             .Select(k => new KullaniciOzet
@@ -71,7 +80,118 @@ public class AdminController : Controller
             })
             .ToListAsync();
 
+        ViewBag.Arama = q;
         return View(liste);
+    }
+
+    // Tek kullanıcı detay + yönetim ekranı
+    public async Task<IActionResult> KullaniciDetay(int id)
+    {
+        var k = await _db.Kullanicilar
+            .Include(u => u.Gorevler).ThenInclude(g => g.Kategori)
+            .Include(u => u.Kategoriler)
+            .FirstOrDefaultAsync(u => u.Id == id);
+
+        if (k is null)
+        {
+            TempData["Hata"] = "Kullanıcı bulunamadı.";
+            return RedirectToAction(nameof(Kullanicilar));
+        }
+
+        var model = new AdminKullaniciDetayViewModel
+        {
+            Kullanici = k,
+            GorevSayisi = k.Gorevler.Count,
+            TamamlananGorev = k.Gorevler.Count(g => g.Durum == GorevDurum.Tamamlandi),
+            KategoriSayisi = k.Kategoriler.Count,
+            Gorevler = k.Gorevler.OrderByDescending(g => g.OlusturmaTarihi).ToList()
+        };
+        return View(model);
+    }
+
+    // Kullanıcı ad/email düzenle
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> KullaniciDuzenle(int id, string adSoyad, string email)
+    {
+        var k = await _db.Kullanicilar.FindAsync(id);
+        if (k is null)
+        {
+            TempData["Hata"] = "Kullanıcı bulunamadı.";
+            return RedirectToAction(nameof(Kullanicilar));
+        }
+
+        adSoyad = (adSoyad ?? string.Empty).Trim();
+        email = (email ?? string.Empty).Trim().ToLowerInvariant();
+
+        if (adSoyad.Length < 2 || string.IsNullOrWhiteSpace(email))
+        {
+            TempData["Hata"] = "Ad soyad en az 2 karakter ve e-posta dolu olmalı.";
+            return RedirectToAction(nameof(KullaniciDetay), new { id });
+        }
+
+        if (await _db.Kullanicilar.AnyAsync(u => u.Email == email && u.Id != id))
+        {
+            TempData["Hata"] = "Bu e-posta başka bir kullanıcıda kayıtlı.";
+            return RedirectToAction(nameof(KullaniciDetay), new { id });
+        }
+
+        k.AdSoyad = adSoyad;
+        k.Email = email;
+        await _db.SaveChangesAsync();
+
+        TempData["Basari"] = "Kullanıcı bilgileri güncellendi.";
+        return RedirectToAction(nameof(KullaniciDetay), new { id });
+    }
+
+    // Kullanıcının şifresini admin sıfırlar
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SifreSifirla(int id, string yeniSifre)
+    {
+        var k = await _db.Kullanicilar.FindAsync(id);
+        if (k is null)
+        {
+            TempData["Hata"] = "Kullanıcı bulunamadı.";
+            return RedirectToAction(nameof(Kullanicilar));
+        }
+
+        if (string.IsNullOrWhiteSpace(yeniSifre) || yeniSifre.Length < 6)
+        {
+            TempData["Hata"] = "Yeni şifre en az 6 karakter olmalı.";
+            return RedirectToAction(nameof(KullaniciDetay), new { id });
+        }
+
+        k.SifreHash = BCrypt.Net.BCrypt.HashPassword(yeniSifre);
+        await _db.SaveChangesAsync();
+
+        TempData["Basari"] = $"\"{k.AdSoyad}\" için yeni şifre belirlendi.";
+        return RedirectToAction(nameof(KullaniciDetay), new { id });
+    }
+
+    // Aktif/Pasif (askıya alma) — kendi hesabına uygulanamaz
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AktiflikToggle(int id)
+    {
+        if (id == AktifKullaniciId)
+        {
+            TempData["Hata"] = "Kendi hesabını askıya alamazsın.";
+            return RedirectToAction(nameof(Kullanicilar));
+        }
+
+        var k = await _db.Kullanicilar.FindAsync(id);
+        if (k is null)
+        {
+            TempData["Hata"] = "Kullanıcı bulunamadı.";
+            return RedirectToAction(nameof(Kullanicilar));
+        }
+
+        k.Aktif = !k.Aktif;
+        await _db.SaveChangesAsync();
+
+        TempData["Basari"] = k.Aktif ? $"\"{k.AdSoyad}\" aktifleştirildi." : $"\"{k.AdSoyad}\" askıya alındı.";
+        return RedirectToAction(nameof(Kullanicilar));
     }
 
     // Kullanıcı sil — ilişkili görev/kategori/alt görevleri cascade siler
@@ -167,5 +287,80 @@ public class AdminController : Controller
 
         TempData["Basari"] = "Görev silindi.";
         return RedirectToAction(nameof(Gorevler));
+    }
+
+    // --- Site ayarları ---
+
+    public async Task<IActionResult> Ayarlar()
+    {
+        var ayar = await _db.SiteAyarlari.FirstOrDefaultAsync() ?? new SiteAyar();
+        return View(ayar);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Ayarlar(SiteAyar model)
+    {
+        var ayar = await _db.SiteAyarlari.FirstOrDefaultAsync();
+        if (ayar is null)
+        {
+            ayar = new SiteAyar();
+            _db.SiteAyarlari.Add(ayar);
+        }
+
+        ayar.BakimModu = model.BakimModu;
+        ayar.KayitAcik = model.KayitAcik;
+        ayar.Duyuru = string.IsNullOrWhiteSpace(model.Duyuru) ? null : model.Duyuru.Trim();
+        ayar.DuyuruAktif = model.DuyuruAktif;
+        await _db.SaveChangesAsync();
+
+        TempData["Basari"] = "Site ayarları kaydedildi.";
+        return RedirectToAction(nameof(Ayarlar));
+    }
+
+    // --- CSV dışa aktarma ---
+
+    public async Task<IActionResult> KullanicilarCsv()
+    {
+        var liste = await _db.Kullanicilar
+            .Select(k => new { k.AdSoyad, k.Email, k.IsAdmin, k.Aktif, k.KayitTarihi, GorevSayisi = k.Gorevler.Count })
+            .ToListAsync();
+
+        var sb = new StringBuilder();
+        sb.AppendLine("Ad Soyad;E-posta;Admin;Aktif;Kayit Tarihi;Gorev Sayisi");
+        foreach (var k in liste)
+            sb.AppendLine($"{CsvKacis(k.AdSoyad)};{CsvKacis(k.Email)};{(k.IsAdmin ? "Evet" : "Hayir")};{(k.Aktif ? "Evet" : "Hayir")};{k.KayitTarihi:dd.MM.yyyy HH:mm};{k.GorevSayisi}");
+
+        return CsvDosya(sb.ToString(), "kullanicilar.csv");
+    }
+
+    public async Task<IActionResult> GorevlerCsv()
+    {
+        var liste = await _db.Gorevler
+            .Include(g => g.Kullanici)
+            .Include(g => g.Kategori)
+            .OrderByDescending(g => g.OlusturmaTarihi)
+            .ToListAsync();
+
+        var sb = new StringBuilder();
+        sb.AppendLine("Baslik;Sahibi;Kategori;Oncelik;Durum;Bitis;Olusturma");
+        foreach (var g in liste)
+            sb.AppendLine($"{CsvKacis(g.Baslik)};{CsvKacis(g.Kullanici?.AdSoyad ?? "")};{CsvKacis(g.Kategori?.Ad ?? "")};{g.Oncelik.Etiket()};{g.Durum.Etiket()};{(g.BitisTarihi?.ToString("dd.MM.yyyy") ?? "")};{g.OlusturmaTarihi:dd.MM.yyyy HH:mm}");
+
+        return CsvDosya(sb.ToString(), "gorevler.csv");
+    }
+
+    private static string CsvKacis(string s) =>
+        s.Contains(';') || s.Contains('"') || s.Contains('\n')
+            ? "\"" + s.Replace("\"", "\"\"") + "\""
+            : s;
+
+    private FileContentResult CsvDosya(string icerik, string ad)
+    {
+        // UTF-8 BOM — Excel Türkçe karakterleri doğru göstersin
+        var bom = new byte[] { 0xEF, 0xBB, 0xBF };
+        var govde = Encoding.UTF8.GetBytes(icerik);
+        var bytes = bom.Concat(govde).ToArray();
+        return File(bytes, "text/csv", ad);
     }
 }

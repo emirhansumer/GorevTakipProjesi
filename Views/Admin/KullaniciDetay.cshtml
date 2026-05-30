@@ -1,0 +1,119 @@
+@model AdminKullaniciDetayViewModel
+@{
+    ViewData["Title"] = "Kullanıcı Detayı";
+    var k = Model.Kullanici;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h2 class="mb-0">
+            <i class="bi bi-person-circle me-2 text-primary"></i> @k.AdSoyad
+            @if (k.IsAdmin)
+            {
+                <span class="badge bg-primary ms-1"><i class="bi bi-shield-fill"></i> Admin</span>
+            }
+            @if (!k.Aktif)
+            {
+                <span class="badge bg-secondary ms-1">Pasif</span>
+            }
+        </h2>
+        <p class="text-muted mb-0 small">@k.Email · Kayıt: @k.KayitTarihi.ToString("dd.MM.yyyy HH:mm")</p>
+    </div>
+    <a asp-action="Kullanicilar" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Kullanıcılar
+    </a>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-4">
+        <div class="card stat-card stat-bekleyen"><div class="card-body">
+            <div class="stat-label">Görev</div><div class="stat-value">@Model.GorevSayisi</div>
+            <i class="bi bi-list-check stat-icon"></i>
+        </div></div>
+    </div>
+    <div class="col-4">
+        <div class="card stat-card stat-tamamlanan"><div class="card-body">
+            <div class="stat-label">Tamamlanan</div><div class="stat-value">@Model.TamamlananGorev</div>
+            <i class="bi bi-check-circle stat-icon"></i>
+        </div></div>
+    </div>
+    <div class="col-4">
+        <div class="card stat-card stat-toplam"><div class="card-body">
+            <div class="stat-label">Kategori</div><div class="stat-value">@Model.KategoriSayisi</div>
+            <i class="bi bi-bookmarks stat-icon"></i>
+        </div></div>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-12 col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header"><span class="fw-semibold"><i class="bi bi-pencil-square me-1 text-primary"></i> Bilgileri Düzenle</span></div>
+            <div class="card-body">
+                <form asp-action="KullaniciDuzenle" asp-route-id="@k.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">Ad Soyad</label>
+                        <input type="text" name="adSoyad" value="@k.AdSoyad" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">E-posta</label>
+                        <input type="email" name="email" value="@k.Email" class="form-control" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header"><span class="fw-semibold"><i class="bi bi-key me-1 text-primary"></i> Şifre Sıfırla</span></div>
+            <div class="card-body">
+                <form asp-action="SifreSifirla" asp-route-id="@k.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">Yeni şifre</label>
+                        <input type="text" name="yeniSifre" class="form-control" minlength="6" placeholder="En az 6 karakter" required />
+                        <div class="form-text">Bu kullanıcının şifresini sıfırlar. Yeni şifreyi kullanıcıya ilet.</div>
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-arrow-repeat me-1"></i> Şifreyi Sıfırla</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header"><span class="fw-semibold"><i class="bi bi-list-task me-1 text-primary"></i> Görevleri (@Model.Gorevler.Count)</span></div>
+    <div class="card-body p-0">
+        @if (!Model.Gorevler.Any())
+        {
+            <div class="empty-state"><i class="bi bi-clipboard-x empty-icon"></i><p class="mb-0">Bu kullanıcının görevi yok.</p></div>
+        }
+        else
+        {
+            <table class="table table-hover align-middle mb-0">
+                <thead><tr><th>Görev</th><th>Kategori</th><th>Öncelik</th><th>Durum</th></tr></thead>
+                <tbody>
+                    @foreach (var g in Model.Gorevler)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@g.Baslik</td>
+                            <td>
+                                @if (g.Kategori is not null)
+                                {
+                                    <span class="kategori-chip @RenkHelper.ChipKoyuClass(g.Kategori.Renk)" style="background:@g.Kategori.Renk;">
+                                        @Html.KategoriIkon(g.Kategori.Ikon)<span>@g.Kategori.Ad</span>
+                                    </span>
+                                }
+                                else { <span class="text-muted small fst-italic">—</span> }
+                            </td>
+                            <td><span class="badge oncelik-badge @g.Oncelik.CssClass()"><i class="bi @g.Oncelik.Ikon() me-1"></i>@g.Oncelik.Etiket()</span></td>
+                            <td><span class="badge @g.Durum.CssClass()"><i class="bi @g.Durum.Ikon() me-1"></i>@g.Durum.Etiket()</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

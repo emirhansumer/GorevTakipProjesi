@@ -44,6 +44,15 @@ public class HomeController : Controller
         return View(model);
     }
 
+    // Bakım modu sayfası — giriş gerektirmez. Admin gelirse normale yönlendirilir.
+    public IActionResult Bakim()
+    {
+        if (HttpContext.Session.AdminMi())
+            return RedirectToAction(nameof(Index));
+
+        return View();
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

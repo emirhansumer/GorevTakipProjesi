@@ -67,6 +67,9 @@ app.UseCookiePolicy();
 app.UseSession();
 app.UseAuthorization();
 
+// Site ayarını yükler + bakım modunu uygular (session'dan sonra olmalı)
+app.UseMiddleware<GorevTakip.Middleware.SiteAyarMiddleware>();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

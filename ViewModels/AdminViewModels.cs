@@ -34,3 +34,13 @@ public class AdminGorevlerViewModel
     public GorevDurum? SeciliDurum { get; set; }
     public int? SeciliKullaniciId { get; set; }
 }
+
+// Tek kullanıcı detay/yönetim ekranı
+public class AdminKullaniciDetayViewModel
+{
+    public Kullanici Kullanici { get; set; } = null!;
+    public int GorevSayisi { get; set; }
+    public int TamamlananGorev { get; set; }
+    public int KategoriSayisi { get; set; }
+    public List<Gorev> Gorevler { get; set; } = new();
+}

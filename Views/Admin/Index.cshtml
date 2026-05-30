@@ -1,21 +1,24 @@
 @model AdminDashboardViewModel
 @{
-    ViewData["Title"] = "Admin Paneli";
+    ViewData["Title"] = "Sistem Yönetimi";
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
     <div>
         <h2 class="mb-0">
-            <i class="bi bi-shield-lock-fill me-2 text-primary"></i> Admin Paneli
+            <i class="bi bi-shield-lock-fill me-2 text-primary"></i> Sistem Yönetimi
         </h2>
         <p class="text-muted mb-0">Sistem geneli özet ve yönetim.</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex flex-wrap gap-2">
         <a asp-action="Kullanicilar" class="btn btn-outline-primary">
             <i class="bi bi-people me-1"></i> Kullanıcılar
         </a>
         <a asp-action="Gorevler" class="btn btn-outline-primary">
             <i class="bi bi-list-task me-1"></i> Tüm Görevler
+        </a>
+        <a asp-action="Ayarlar" class="btn btn-outline-primary">
+            <i class="bi bi-gear me-1"></i> Site Ayarları
         </a>
     </div>
 </div>
@@ -59,92 +62,128 @@
     </div>
 </div>
 
-<div class="card shadow-sm mb-4">
-    <div class="card-header">
-        <span class="fw-semibold"><i class="bi bi-pie-chart me-1 text-primary"></i> Görev Durum Dağılımı</span>
+<div class="row g-3 mb-4">
+    <div class="col-12 col-lg-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-header">
+                <span class="fw-semibold"><i class="bi bi-pie-chart me-1 text-primary"></i> Görev Durum Dağılımı</span>
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-center" style="min-height: 260px;">
+                @if (Model.ToplamGorev == 0)
+                {
+                    <span class="text-muted">Henüz görev yok.</span>
+                }
+                else
+                {
+                    <canvas id="durumChart" style="max-height: 240px;"></canvas>
+                }
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <div class="row g-3 text-center">
-            <div class="col-4">
-                <div class="badge @GorevDurum.Bekliyor.CssClass() fs-6 d-block py-2">
-                    <i class="bi @GorevDurum.Bekliyor.Ikon() me-1"></i> Bekleyen: @Model.BekleyenGorev
-                </div>
+    <div class="col-12 col-lg-7">
+        <div class="card shadow-sm h-100">
+            <div class="card-header">
+                <span class="fw-semibold"><i class="bi bi-bar-chart me-1 text-primary"></i> En Aktif Kullanıcılar (görev sayısı)</span>
             </div>
-            <div class="col-4">
-                <div class="badge @GorevDurum.Tamamlandi.CssClass() fs-6 d-block py-2">
-                    <i class="bi @GorevDurum.Tamamlandi.Ikon() me-1"></i> Tamamlanan: @Model.TamamlananGorev
-                </div>
-            </div>
-            <div class="col-4">
-                <div class="badge @GorevDurum.Iptal.CssClass() fs-6 d-block py-2">
-                    <i class="bi @GorevDurum.Iptal.Ikon() me-1"></i> İptal: @Model.IptalGorev
-                </div>
+            <div class="card-body d-flex align-items-center justify-content-center" style="min-height: 260px;">
+                @if (!Model.EnAktifKullanicilar.Any())
+                {
+                    <span class="text-muted">Henüz görevi olan kullanıcı yok.</span>
+                }
+                else
+                {
+                    <canvas id="aktifChart" style="max-height: 240px;"></canvas>
+                }
             </div>
         </div>
     </div>
 </div>
 
-<div class="row g-3">
-    <div class="col-12 col-lg-6">
-        <div class="card shadow-sm h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span class="fw-semibold"><i class="bi bi-trophy me-1 text-primary"></i> En Aktif Kullanıcılar</span>
-            </div>
-            <div class="card-body p-0">
-                @if (!Model.EnAktifKullanicilar.Any())
-                {
-                    <div class="empty-state"><i class="bi bi-people empty-icon"></i><p class="mb-0">Henüz görevi olan kullanıcı yok.</p></div>
-                }
-                else
-                {
-                    <table class="table mb-0 align-middle">
-                        <tbody>
-                            @foreach (var ozet in Model.EnAktifKullanicilar)
-                            {
-                                <tr>
-                                    <td>
-                                        <span class="fw-semibold">@ozet.Kullanici.AdSoyad</span>
-                                        <div class="text-muted small">@ozet.Kullanici.Email</div>
-                                    </td>
-                                    <td class="text-end">
-                                        <span class="badge bg-primary"><i class="bi bi-list-check me-1"></i>@ozet.GorevSayisi görev</span>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-            </div>
-        </div>
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold"><i class="bi bi-person-plus me-1 text-primary"></i> Son Kayıt Olanlar</span>
+        <a asp-action="Kullanicilar" class="small text-decoration-none">Tümü <i class="bi bi-arrow-right"></i></a>
     </div>
-    <div class="col-12 col-lg-6">
-        <div class="card shadow-sm h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span class="fw-semibold"><i class="bi bi-person-plus me-1 text-primary"></i> Son Kayıt Olanlar</span>
-                <a asp-action="Kullanicilar" class="small text-decoration-none">Tümü <i class="bi bi-arrow-right"></i></a>
-            </div>
-            <div class="card-body p-0">
-                <table class="table mb-0 align-middle">
-                    <tbody>
-                        @foreach (var ozet in Model.SonKullanicilar)
-                        {
-                            <tr>
-                                <td>
-                                    <span class="fw-semibold">@ozet.Kullanici.AdSoyad</span>
-                                    @if (ozet.Kullanici.IsAdmin)
-                                    {
-                                        <span class="badge bg-primary ms-1"><i class="bi bi-shield-fill"></i> Admin</span>
-                                    }
-                                    <div class="text-muted small">@ozet.Kullanici.Email</div>
-                                </td>
-                                <td class="text-end text-muted small">
-                                    <i class="bi bi-clock me-1"></i>@ozet.Kullanici.KayitTarihi.ToString("dd.MM.yyyy")
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <div class="card-body p-0">
+        <table class="table mb-0 align-middle">
+            <tbody>
+                @foreach (var ozet in Model.SonKullanicilar)
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="KullaniciDetay" asp-route-id="@ozet.Kullanici.Id" class="gorev-baslik-link fw-semibold">@ozet.Kullanici.AdSoyad</a>
+                            @if (ozet.Kullanici.IsAdmin)
+                            {
+                                <span class="badge bg-primary ms-1"><i class="bi bi-shield-fill"></i> Admin</span>
+                            }
+                            @if (!ozet.Kullanici.Aktif)
+                            {
+                                <span class="badge bg-secondary ms-1">Pasif</span>
+                            }
+                            <div class="text-muted small">@ozet.Kullanici.Email</div>
+                        </td>
+                        <td class="text-end text-muted small">
+                            <i class="bi bi-clock me-1"></i>@ozet.Kullanici.KayitTarihi.ToString("dd.MM.yyyy")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+        (function () {
+            if (typeof Chart === 'undefined') return;
+            var eksenRenk = '#94a3b8';
+
+            var durumEl = document.getElementById('durumChart');
+            if (durumEl) {
+                new Chart(durumEl, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Bekleyen', 'Tamamlanan', 'İptal'],
+                        datasets: [{
+                            data: [@Model.BekleyenGorev, @Model.TamamlananGorev, @Model.IptalGorev],
+                            backgroundColor: ['#f59e0b', '#10b981', '#94a3b8'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom', labels: { color: eksenRenk, padding: 14 } } }
+                    }
+                });
+            }
+
+            var aktifEl = document.getElementById('aktifChart');
+            if (aktifEl) {
+                new Chart(aktifEl, {
+                    type: 'bar',
+                    data: {
+                        labels: @Html.Raw(Json.Serialize(Model.EnAktifKullanicilar.Select(x => x.Kullanici.AdSoyad))),
+                        datasets: [{
+                            label: 'Görev sayısı',
+                            data: @Html.Raw(Json.Serialize(Model.EnAktifKullanicilar.Select(x => x.GorevSayisi))),
+                            backgroundColor: '#6366f1',
+                            borderRadius: 6,
+                            maxBarThickness: 46
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { color: eksenRenk }, grid: { display: false } },
+                            y: { beginAtZero: true, ticks: { color: eksenRenk, precision: 0 }, grid: { color: 'rgba(148,163,184,0.15)' } }
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
+}

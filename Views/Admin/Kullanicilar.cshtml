@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Kullanıcılar";
     var aktifId = Context.Session.GetKullaniciId();
+    var arama = ViewBag.Arama as string ?? "";
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
@@ -9,10 +10,27 @@
         <h2 class="mb-0"><i class="bi bi-people-fill me-2 text-primary"></i> Kullanıcılar</h2>
         <p class="text-muted mb-0 small">@Model.Count kullanıcı</p>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-1"></i> Admin Paneli
-    </a>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-action="KullanicilarCsv" class="btn btn-outline-success">
+            <i class="bi bi-filetype-csv me-1"></i> CSV indir
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Panel
+        </a>
+    </div>
 </div>
+
+<form asp-action="Kullanicilar" method="get" class="mb-3">
+    <div class="input-group" style="max-width: 420px;">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" name="q" value="@arama" class="form-control" placeholder="Ad veya e-posta ara…" autocomplete="off" />
+        <button type="submit" class="btn btn-primary">Ara</button>
+        @if (!string.IsNullOrWhiteSpace(arama))
+        {
+            <a asp-action="Kullanicilar" class="btn btn-outline-secondary">Temizle</a>
+        }
+    </div>
+</form>
 
 <div class="card shadow-sm">
     <div class="table-responsive">
@@ -28,43 +46,56 @@
                 </tr>
             </thead>
             <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="6"><div class="empty-state"><i class="bi bi-search empty-icon"></i><p class="mb-0">Sonuç yok.</p></div></td></tr>
+                }
                 @foreach (var ozet in Model)
                 {
                     var k = ozet.Kullanici;
                     var benMi = k.Id == aktifId;
-                    <tr>
+                    <tr class="@(k.Aktif ? "" : "opacity-75")">
                         <td>
-                            <span class="fw-semibold">@k.AdSoyad</span>
+                            <a asp-action="KullaniciDetay" asp-route-id="@k.Id" class="gorev-baslik-link fw-semibold">@k.AdSoyad</a>
                             @if (k.IsAdmin)
                             {
                                 <span class="badge bg-primary ms-1"><i class="bi bi-shield-fill"></i> Admin</span>
                             }
+                            @if (!k.Aktif)
+                            {
+                                <span class="badge bg-secondary ms-1"><i class="bi bi-pause-circle"></i> Pasif</span>
+                            }
                             @if (benMi)
                             {
-                                <span class="badge bg-secondary ms-1">Sen</span>
+                                <span class="badge bg-light text-dark border ms-1">Sen</span>
                             }
                         </td>
                         <td class="text-muted">@k.Email</td>
                         <td class="text-center"><span class="badge bg-light text-dark border">@ozet.GorevSayisi</span></td>
                         <td class="text-center"><span class="badge bg-light text-dark border">@ozet.KategoriSayisi</span></td>
                         <td class="text-muted small">@k.KayitTarihi.ToString("dd.MM.yyyy")</td>
-                        <td class="text-end">
-                            @if (benMi)
+                        <td class="text-end text-nowrap">
+                            <a asp-action="KullaniciDetay" asp-route-id="@k.Id" class="btn btn-sm btn-outline-secondary" title="Detay / yönet">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            @if (!benMi)
                             {
-                                <span class="text-muted small fst-italic">—</span>
-                            }
-                            else
-                            {
+                                <form asp-action="AktiflikToggle" asp-route-id="@k.Id" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm @(k.Aktif ? "btn-outline-warning" : "btn-outline-success")"
+                                            title="@(k.Aktif ? "Askıya al" : "Aktifleştir")">
+                                        <i class="bi @(k.Aktif ? "bi-pause-circle" : "bi-play-circle")"></i>
+                                    </button>
+                                </form>
                                 <form asp-action="AdminYetkiToggle" asp-route-id="@k.Id" method="post" class="d-inline">
                                     @Html.AntiForgeryToken()
                                     <button type="submit" class="btn btn-sm @(k.IsAdmin ? "btn-outline-secondary" : "btn-outline-primary")"
                                             title="@(k.IsAdmin ? "Admin yetkisini kaldır" : "Admin yap")">
                                         <i class="bi @(k.IsAdmin ? "bi-shield-slash" : "bi-shield-plus")"></i>
-                                        @(k.IsAdmin ? "Yetkiyi al" : "Admin yap")
                                     </button>
                                 </form>
-                                <button type="button" class="btn btn-sm btn-outline-danger" title="Kullanıcıyı sil"
-                                        onclick="GorevTakip.silOnayi('kullanici-sil-@k.Id', { text: '@Html.Raw(Html.Encode(k.AdSoyad)) ve TÜM görev/kategorileri silinecek. Emin misin?' })">
+                                <button type="button" class="btn btn-sm btn-outline-danger" title="Sil"
+                                        onclick="GorevTakip.silOnayi('kullanici-sil-@k.Id', { text: '@Html.Raw(Html.Encode(k.AdSoyad)) ve TÜM verileri silinecek. Emin misin?' })">
                                     <i class="bi bi-trash"></i>
                                 </button>
                                 <form id="kullanici-sil-@k.Id" asp-action="KullaniciSil" asp-route-id="@k.Id" method="post" class="d-none">

@@ -24,8 +24,17 @@ public static class DbSeeder
                 Email = AdminEmail,
                 SifreHash = BCrypt.Net.BCrypt.HashPassword(AdminSifre),
                 IsAdmin = true,
+                Aktif = true,
                 KayitTarihi = DateTime.Now
             });
+            await db.SaveChangesAsync();
+        }
+
+        // Tek satırlık site ayarı yoksa varsayılanı oluştur
+        var ayarVar = await db.SiteAyarlari.AnyAsync();
+        if (!ayarVar)
+        {
+            db.SiteAyarlari.Add(new SiteAyar { BakimModu = false, KayitAcik = true, DuyuruAktif = false });
             await db.SaveChangesAsync();
         }
     }
