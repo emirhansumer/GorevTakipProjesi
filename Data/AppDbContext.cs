@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     public DbSet<Gorev> Gorevler => Set<Gorev>();
     public DbSet<Kategori> Kategoriler => Set<Kategori>();
     public DbSet<AltGorev> AltGorevler => Set<AltGorev>();
+    public DbSet<SiteAyar> SiteAyarlari => Set<SiteAyar>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

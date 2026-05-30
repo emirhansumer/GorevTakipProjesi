@@ -18,10 +18,16 @@ public class AccountController : Controller
     }
 
     [HttpGet]
-    public IActionResult Register()
+    public async Task<IActionResult> Register()
     {
         if (HttpContext.Session.GirisYapildiMi())
             return RedirectToAction("Index", "Home");
+
+        if (!await KayitAcikMi())
+        {
+            TempData["Hata"] = "Yeni kayıtlar şu an kapalı.";
+            return RedirectToAction(nameof(Login));
+        }
 
         return View();
     }
@@ -32,6 +38,12 @@ public class AccountController : Controller
     {
         if (!ModelState.IsValid)
             return View(model);
+
+        if (!await KayitAcikMi())
+        {
+            TempData["Hata"] = "Yeni kayıtlar şu an kapalı.";
+            return RedirectToAction(nameof(Login));
+        }
 
         var emailVar = await _db.Kullanicilar.AnyAsync(k => k.Email == model.Email);
         if (emailVar)
@@ -56,6 +68,12 @@ public class AccountController : Controller
 
         TempData["Mesaj"] = "Kayıt başarılı. Lütfen giriş yapın.";
         return RedirectToAction(nameof(Login));
+    }
+
+    private async Task<bool> KayitAcikMi()
+    {
+        var ayar = await _db.SiteAyarlari.AsNoTracking().FirstOrDefaultAsync();
+        return ayar?.KayitAcik ?? true;
     }
 
     private async Task OrnekVerileriOlustur(int kullaniciId)
@@ -136,7 +154,13 @@ public class AccountController : Controller
             return View(model);
         }
 
-        HttpContext.Session.GirisYap(kullanici.Id, kullanici.AdSoyad, kullanici.Email);
+        if (!kullanici.Aktif)
+        {
+            ModelState.AddModelError(string.Empty, "Hesabınız askıya alınmış. Yöneticiyle iletişime geçin.");
+            return View(model);
+        }
+
+        HttpContext.Session.GirisYap(kullanici.Id, kullanici.AdSoyad, kullanici.Email, kullanici.IsAdmin);
         return RedirectToAction("Index", "Home");
     }
 

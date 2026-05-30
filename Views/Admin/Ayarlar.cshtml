@@ -1,0 +1,53 @@
+@model SiteAyar
+@{
+    ViewData["Title"] = "Site Ayarları";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-gear-fill me-2 text-primary"></i> Site Ayarları</h2>
+        <p class="text-muted mb-0 small">Site genelini buradan kontrol et.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Panel</a>
+</div>
+
+<form asp-action="Ayarlar" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-header"><span class="fw-semibold"><i class="bi bi-toggles me-1 text-primary"></i> Erişim</span></div>
+        <div class="card-body">
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" role="switch" id="BakimModu" asp-for="BakimModu" />
+                <label class="form-check-label" for="BakimModu">
+                    <strong>Bakım Modu</strong>
+                    <div class="text-muted small">Açıkken siteyi yalnızca yöneticiler görebilir; diğerleri "bakımda" sayfasıyla karşılaşır.</div>
+                </label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="KayitAcik" asp-for="KayitAcik" />
+                <label class="form-check-label" for="KayitAcik">
+                    <strong>Yeni Kayıtlara İzin Ver</strong>
+                    <div class="text-muted small">Kapalıyken yeni kullanıcı kaydı yapılamaz ve "Kayıt Ol" gizlenir.</div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-header"><span class="fw-semibold"><i class="bi bi-megaphone me-1 text-primary"></i> Duyuru</span></div>
+        <div class="card-body">
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" role="switch" id="DuyuruAktif" asp-for="DuyuruAktif" />
+                <label class="form-check-label" for="DuyuruAktif"><strong>Duyuruyu Göster</strong></label>
+            </div>
+            <div class="mb-1">
+                <label class="form-label">Duyuru metni</label>
+                <textarea asp-for="Duyuru" class="form-control" rows="2" maxlength="300" placeholder="Tüm kullanıcılara üstte gösterilecek mesaj…"></textarea>
+            </div>
+            <div class="form-text">Açık olduğunda tüm sayfaların üstünde bir bilgi şeridi olarak görünür.</div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> Ayarları Kaydet</button>
+</form>

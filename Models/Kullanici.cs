@@ -18,6 +18,12 @@ public class Kullanici
     [Required]
     public string SifreHash { get; set; } = string.Empty;
 
+    // Admin paneline erişim yetkisi. Sadece yönetici hesaplarında true.
+    public bool IsAdmin { get; set; }
+
+    // Pasif kullanıcı giriş yapamaz (admin tarafından askıya alınabilir).
+    public bool Aktif { get; set; } = true;
+
     public DateTime KayitTarihi { get; set; } = DateTime.Now;
 
     public ICollection<Gorev> Gorevler { get; set; } = new List<Gorev>();

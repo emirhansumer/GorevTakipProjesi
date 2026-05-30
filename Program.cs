@@ -37,6 +37,13 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 
 var app = builder.Build();
 
+// Açılışta: bekleyen migration'ları uygula + admin hesabını garanti et
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await DbSeeder.BaslangicVerileriniHazirla(db);
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -59,6 +66,9 @@ app.UseRouting();
 app.UseCookiePolicy();
 app.UseSession();
 app.UseAuthorization();
+
+// Site ayarını yükler + bakım modunu uygular (session'dan sonra olmalı)
+app.UseMiddleware<GorevTakip.Middleware.SiteAyarMiddleware>();
 
 app.MapControllerRoute(
     name: "default",
