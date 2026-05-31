@@ -86,6 +86,10 @@ public class ProjeController : Controller
                 .Include(g => g.Kullanici)
                 .Where(g => g.ProjeId == id)
                 .OrderByDescending(g => g.OlusturmaTarihi)
+                .ToListAsync(),
+            Kategoriler = await _db.Kategoriler
+                .Where(k => k.KullaniciId == AktifKullaniciId)
+                .OrderBy(k => k.Sira)
                 .ToListAsync()
         };
         return View(model);
@@ -159,7 +163,7 @@ public class ProjeController : Controller
     // Seçili üye(ler)e görev ata — her üyeye kendi kopyası oluşur
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> GorevAta(int projeId, string baslik, string? aciklama, Oncelik oncelik, DateTime? bitisTarihi, int[] uyeIdler)
+    public async Task<IActionResult> GorevAta(int projeId, string baslik, string? aciklama, Oncelik oncelik, DateTime? bitisTarihi, int? kategoriId, int[] uyeIdler)
     {
         var proje = await ProjemiGetir(projeId);
         if (proje is null) return RedirectToAction(nameof(Index));
@@ -183,6 +187,10 @@ public class ProjeController : Controller
             return RedirectToAction(nameof(Detay), new { id = projeId });
         }
 
+        // Kategori seçildiyse lidere ait olmalı (başkasının kategorisi atanamaz)
+        if (kategoriId.HasValue && !await _db.Kategoriler.AnyAsync(k => k.Id == kategoriId.Value && k.KullaniciId == AktifKullaniciId))
+            kategoriId = null;
+
         var simdi = DateTime.Now;
         foreach (var uyeId in gecerliUyeler)
         {
@@ -192,6 +200,7 @@ public class ProjeController : Controller
                 Aciklama = string.IsNullOrWhiteSpace(aciklama) ? null : aciklama.Trim(),
                 Oncelik = oncelik,
                 BitisTarihi = bitisTarihi,
+                KategoriId = kategoriId,
                 Durum = GorevDurum.Bekliyor,
                 OlusturmaTarihi = simdi,
                 KullaniciId = uyeId,
@@ -208,7 +217,7 @@ public class ProjeController : Controller
     // Atanan görevi düzenle (yalnızca bu projenin lideri)
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AtamaDuzenle(int gorevId, string baslik, string? aciklama, Oncelik oncelik, DateTime? bitisTarihi)
+    public async Task<IActionResult> AtamaDuzenle(int gorevId, string baslik, string? aciklama, Oncelik oncelik, DateTime? bitisTarihi, int? kategoriId)
     {
         var gorev = await _db.Gorevler.Include(g => g.Proje).FirstOrDefaultAsync(g => g.Id == gorevId);
         if (gorev?.Proje is null || gorev.Proje.LiderId != AktifKullaniciId)
@@ -217,10 +226,14 @@ public class ProjeController : Controller
         baslik = (baslik ?? string.Empty).Trim();
         if (baslik.Length >= 1)
         {
+            if (kategoriId.HasValue && !await _db.Kategoriler.AnyAsync(k => k.Id == kategoriId.Value && k.KullaniciId == AktifKullaniciId))
+                kategoriId = null;
+
             gorev.Baslik = baslik;
             gorev.Aciklama = string.IsNullOrWhiteSpace(aciklama) ? null : aciklama.Trim();
             gorev.Oncelik = oncelik;
             gorev.BitisTarihi = bitisTarihi;
+            gorev.KategoriId = kategoriId;
             await _db.SaveChangesAsync();
             TempData["Basari"] = "Atanan görev güncellendi.";
         }

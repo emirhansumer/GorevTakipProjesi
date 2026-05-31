@@ -130,9 +130,19 @@
                         <label class="form-label small">Bitiş</label>
                         <input type="date" name="bitisTarihi" class="form-control" />
                     </div>
-                    <div class="col-12">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label small">Kategori (isteğe bağlı)</label>
+                        <select name="kategoriId" class="form-select">
+                            <option value="">Kategorisiz</option>
+                            @foreach (var kat in Model.Kategoriler)
+                            {
+                                <option value="@kat.Id">@kat.Ad</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-8">
                         <label class="form-label small">Açıklama (isteğe bağlı)</label>
-                        <textarea name="aciklama" class="form-control" rows="2"></textarea>
+                        <textarea name="aciklama" class="form-control" rows="1"></textarea>
                     </div>
                     <div class="col-12">
                         <label class="form-label small d-block">Kime atanacak?</label>
@@ -187,9 +197,19 @@
                             <td colspan="6" class="bg-body-tertiary">
                                 <form asp-action="AtamaDuzenle" asp-route-gorevId="@g.Id" method="post" class="row g-2 align-items-end py-2">
                                     @Html.AntiForgeryToken()
-                                    <div class="col-12 col-md-4">
+                                    <div class="col-12 col-md-3">
                                         <label class="form-label small mb-0">Başlık</label>
                                         <input type="text" name="baslik" value="@g.Baslik" class="form-control form-control-sm" required />
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label class="form-label small mb-0">Kategori</label>
+                                        <select name="kategoriId" class="form-select form-select-sm">
+                                            <option value="">Kategorisiz</option>
+                                            @foreach (var kat in Model.Kategoriler)
+                                            {
+                                                <option value="@kat.Id" selected="@(g.KategoriId == kat.Id)">@kat.Ad</option>
+                                            }
+                                        </select>
                                     </div>
                                     <div class="col-6 col-md-2">
                                         <label class="form-label small mb-0">Öncelik</label>
@@ -204,7 +224,7 @@
                                         <label class="form-label small mb-0">Bitiş</label>
                                         <input type="date" name="bitisTarihi" value="@(g.BitisTarihi?.ToString("yyyy-MM-dd"))" class="form-control form-control-sm" />
                                     </div>
-                                    <div class="col-12 col-md-3">
+                                    <div class="col-6 col-md-2">
                                         <label class="form-label small mb-0">Açıklama</label>
                                         <input type="text" name="aciklama" value="@g.Aciklama" class="form-control form-control-sm" />
                                     </div>

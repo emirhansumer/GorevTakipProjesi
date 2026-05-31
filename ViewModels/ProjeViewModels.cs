@@ -19,6 +19,7 @@ public class ProjeDetayViewModel
     public List<ProjeUye> Uyeler { get; set; } = new();
     public List<ProjeDavet> BekleyenDavetler { get; set; } = new();
     public List<Gorev> Gorevler { get; set; } = new();
+    public List<Kategori> Kategoriler { get; set; } = new();
     public int GorevSayisi => Gorevler.Count;
     public int TamamlananGorev => Gorevler.Count(g => g.Durum == GorevDurum.Tamamlandi);
     public int Yuzde => GorevSayisi == 0 ? 0 : (int)System.Math.Round((double)TamamlananGorev * 100 / GorevSayisi);
