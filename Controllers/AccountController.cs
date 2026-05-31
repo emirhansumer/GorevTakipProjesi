@@ -160,7 +160,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        HttpContext.Session.GirisYap(kullanici.Id, kullanici.AdSoyad, kullanici.Email, kullanici.IsAdmin);
+        HttpContext.Session.GirisYap(kullanici.Id, kullanici.AdSoyad, kullanici.Email, kullanici.Rol);
         return RedirectToAction("Index", "Home");
     }
 

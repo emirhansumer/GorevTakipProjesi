@@ -1,0 +1,71 @@
+@model List<IletisimMesaji>
+@{
+    ViewData["Title"] = "Mesajlar";
+    var okunmamis = Model.Count(m => !m.Okundu);
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h2 class="mb-0">
+            <i class="bi bi-inbox me-2 text-primary"></i> Gelen Mesajlar
+            @if (okunmamis > 0)
+            {
+                <span class="badge bg-danger ms-1">@okunmamis yeni</span>
+            }
+        </h2>
+        <p class="text-muted mb-0 small">@Model.Count mesaj</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Panel</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card shadow-sm">
+        <div class="card-body empty-state">
+            <i class="bi bi-inbox empty-icon"></i>
+            <p class="mb-0">Henüz mesaj yok.</p>
+        </div>
+    </div>
+}
+else
+{
+    @foreach (var m in Model)
+    {
+        <div class="card shadow-sm mb-3 @(m.Okundu ? "" : "border-primary")">
+            <div class="card-body">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+                    <div>
+                        <span class="fw-semibold"><i class="bi bi-person-circle me-1 text-muted"></i>@m.AdSoyad</span>
+                        <a href="mailto:@m.Email" class="text-decoration-none small ms-1">@m.Email</a>
+                        @if (!m.Okundu)
+                        {
+                            <span class="badge bg-primary ms-1">Yeni</span>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(m.Konu))
+                        {
+                            <div class="mt-1"><span class="text-muted small">Konu:</span> <span class="fw-semibold">@m.Konu</span></div>
+                        }
+                    </div>
+                    <span class="text-muted small text-nowrap"><i class="bi bi-clock me-1"></i>@m.OlusturmaTarihi.ToString("dd.MM.yyyy HH:mm")</span>
+                </div>
+
+                <p class="mb-3" style="white-space: pre-wrap;">@m.Mesaj</p>
+
+                <div class="d-flex gap-2">
+                    <form asp-action="MesajOkundu" asp-route-id="@m.Id" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm @(m.Okundu ? "btn-outline-secondary" : "btn-outline-success")">
+                            <i class="bi @(m.Okundu ? "bi-envelope" : "bi-envelope-open")"></i>
+                            @(m.Okundu ? "Okunmadı yap" : "Okundu yap")
+                        </button>
+                    </form>
+                    <button type="button" class="btn btn-sm btn-outline-danger"
+                            onclick="GorevTakip.silOnayi('mesaj-sil-@m.Id', { text: '@Html.Raw(Html.Encode(m.AdSoyad)) kişisinin mesajı silinecek. Emin misin?' })">
+                        <i class="bi bi-trash me-1"></i> Sil
+                    </button>
+                    <form id="mesaj-sil-@m.Id" asp-action="MesajSil" asp-route-id="@m.Id" method="post" class="d-none">@Html.AntiForgeryToken()</form>
+                </div>
+            </div>
+        </div>
+    }
+}

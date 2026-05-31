@@ -84,6 +84,11 @@ html, body {
 :root[data-tema="dark"] .alert-info { background-color: rgba(129, 140, 248, 0.12); border-color: rgba(129, 140, 248, 0.3); color: #a5b4fc; }
 :root[data-tema="dark"] .text-muted { color: var(--gt-text-muted) !important; }
 :root[data-tema="dark"] .bg-light { background-color: var(--gt-bg) !important; color: var(--gt-text); }
+:root[data-tema="dark"] .badge.bg-light.text-dark { color: var(--gt-text) !important; border-color: var(--gt-border) !important; }
+:root[data-tema="dark"] .list-group-item { background-color: transparent; border-color: var(--gt-border); color: var(--gt-text); }
+:root[data-tema="dark"] .bg-body-tertiary { background-color: var(--gt-bg) !important; color: var(--gt-text); }
+:root[data-tema="dark"] .alert-warning { background-color: rgba(251, 191, 36, 0.12); border-color: rgba(251, 191, 36, 0.3); color: #fcd34d; }
+:root[data-tema="dark"] .alert-primary { background-color: rgba(129, 140, 248, 0.12); border-color: rgba(129, 140, 248, 0.3); color: #a5b4fc; }
 :root[data-tema="dark"] .border { border-color: var(--gt-border) !important; }
 :root[data-tema="dark"] hr { border-color: var(--gt-border); }
 :root[data-tema="dark"] code { color: var(--gt-text); background-color: var(--gt-bg); padding: 2px 6px; border-radius: 4px; }

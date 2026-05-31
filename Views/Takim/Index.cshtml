@@ -1,0 +1,80 @@
+@model TakimlarimViewModel
+@{
+    ViewData["Title"] = "Takımlarım";
+}
+
+<div class="mb-3">
+    <h2 class="mb-0"><i class="bi bi-people me-2 text-primary"></i> Takımlarım</h2>
+    <p class="text-muted mb-0 small">Davetlerin ve üyesi olduğun projeler</p>
+</div>
+
+@if (Model.BekleyenDavetler.Any())
+{
+    <div class="card shadow-sm mb-3 border-primary">
+        <div class="card-header bg-primary text-white">
+            <span class="fw-semibold"><i class="bi bi-envelope-paper-heart me-1"></i> Bekleyen Davetler (@Model.BekleyenDavetler.Count)</span>
+        </div>
+        <div class="card-body">
+            @foreach (var d in Model.BekleyenDavetler)
+            {
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 py-2 border-bottom">
+                    <div>
+                        <span class="fw-semibold"><i class="bi bi-kanban me-1 text-primary"></i>@d.Proje?.Ad</span>
+                        <div class="text-muted small">Davet eden: @d.Proje?.Lider?.AdSoyad</div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <form asp-action="DavetKabul" asp-route-id="@d.Id" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg me-1"></i> Kabul Et</button>
+                        </form>
+                        <form asp-action="DavetReddet" asp-route-id="@d.Id" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-lg me-1"></i> Reddet</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-header"><span class="fw-semibold"><i class="bi bi-diagram-3 me-1 text-primary"></i> Üyesi Olduğum Projeler (@Model.Projeler.Count)</span></div>
+    <div class="card-body">
+        @if (!Model.Projeler.Any())
+        {
+            <div class="empty-state"><i class="bi bi-people empty-icon"></i><p class="mb-0">Henüz bir projeye üye değilsin.</p></div>
+        }
+        else
+        {
+            @foreach (var pv in Model.Projeler)
+            {
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold"><i class="bi bi-kanban me-1 text-primary"></i>@pv.Proje.Ad</span>
+                        <span class="text-muted small">Lider: @pv.Proje.Lider?.AdSoyad</span>
+                    </div>
+                    @if (!pv.BanaAtananlar.Any())
+                    {
+                        <div class="text-muted small ms-3">Sana atanmış görev yok.</div>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush ms-3">
+                            @foreach (var g in pv.BanaAtananlar)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <a asp-controller="Gorev" asp-action="Detail" asp-route-id="@g.Id" class="gorev-baslik-link">@g.Baslik</a>
+                                    <span>
+                                        <span class="badge oncelik-badge @g.Oncelik.CssClass() me-1"><i class="bi @g.Oncelik.Ikon() me-1"></i>@g.Oncelik.Etiket()</span>
+                                        <span class="badge @g.Durum.CssClass()"><i class="bi @g.Durum.Ikon() me-1"></i>@g.Durum.Etiket()</span>
+                                    </span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>

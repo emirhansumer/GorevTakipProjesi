@@ -168,6 +168,8 @@ public class GorevController : Controller
         var sorgu = _db.Gorevler
             .Include(g => g.Kategori)
             .Include(g => g.AltGorevler)
+            .Include(g => g.Proje)
+            .Include(g => g.Atayan)
             .Where(g => g.KullaniciId == AktifKullaniciId);
 
         if (durum.HasValue)
@@ -332,6 +334,13 @@ public class GorevController : Controller
 
         if (gorev is null)
             return NotFound();
+
+        // Bir proje lideri tarafından atanan görevi üye silemez (yalnızca atayan kaldırabilir)
+        if (gorev.AtayanId != null)
+        {
+            TempData["Hata"] = "Bu görev sana atandı; yalnızca atayan kişi kaldırabilir.";
+            return RedirectToAction(nameof(Index));
+        }
 
         _db.Gorevler.Remove(gorev);
         await _db.SaveChangesAsync();

@@ -44,6 +44,47 @@ public class HomeController : Controller
         return View(model);
     }
 
+    // KVKK Aydınlatma Metni — giriş gerektirmez (herkese açık)
+    public IActionResult Kvkk()
+    {
+        return View();
+    }
+
+    // İletişim formu — herkese açık. Girişliyse ad/e-posta önceden doldurulur.
+    [HttpGet]
+    public IActionResult Iletisim()
+    {
+        var model = new IletisimMesaji
+        {
+            AdSoyad = HttpContext.Session.GetAdSoyad() ?? string.Empty,
+            Email = HttpContext.Session.GetEmail() ?? string.Empty
+        };
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Iletisim(IletisimMesaji model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        // Güvenlik: Id/Okundu/Tarih client'tan alınmaz, sunucuda set edilir
+        _db.IletisimMesajlari.Add(new IletisimMesaji
+        {
+            AdSoyad = model.AdSoyad.Trim(),
+            Email = model.Email.Trim(),
+            Konu = string.IsNullOrWhiteSpace(model.Konu) ? null : model.Konu.Trim(),
+            Mesaj = model.Mesaj.Trim(),
+            OlusturmaTarihi = DateTime.Now,
+            Okundu = false
+        });
+        await _db.SaveChangesAsync();
+
+        TempData["Basari"] = "Mesajın iletildi. En kısa sürede dönüş yapılacaktır.";
+        return RedirectToAction(nameof(Iletisim));
+    }
+
     // Bakım modu sayfası — giriş gerektirmez. Admin gelirse normale yönlendirilir.
     public IActionResult Bakim()
     {

@@ -38,5 +38,15 @@ public class Gorev
 
     public Kategori? Kategori { get; set; }
 
+    // Görevi atayan proje lideri. Null ise kullanıcının kendi eklediği görev.
+    [ForeignKey(nameof(Atayan))]
+    public int? AtayanId { get; set; }
+    public Kullanici? Atayan { get; set; }
+
+    // Atanan görevin ait olduğu proje (varsa).
+    [ForeignKey(nameof(Proje))]
+    public int? ProjeId { get; set; }
+    public Proje? Proje { get; set; }
+
     public ICollection<AltGorev> AltGorevler { get; set; } = new List<AltGorev>();
 }
