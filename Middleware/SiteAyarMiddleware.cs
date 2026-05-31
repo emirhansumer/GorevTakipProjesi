@@ -18,10 +18,26 @@ public class SiteAyarMiddleware
         var ayar = await db.SiteAyarlari.AsNoTracking().FirstOrDefaultAsync() ?? new SiteAyar();
         context.Items["SiteAyar"] = ayar;
 
-        // Giriş yapan kullanıcının bekleyen davet sayısı (navbar rozeti için)
         var uid = context.Session.GetKullaniciId();
         if (uid.HasValue)
         {
+            var hesap = await db.Kullanicilar.AsNoTracking()
+                .Where(k => k.Id == uid.Value)
+                .Select(k => new { k.Aktif })
+                .FirstOrDefaultAsync();
+
+            var path = context.Request.Path.Value ?? string.Empty;
+            var accountYolu = path.StartsWith("/Account", StringComparison.OrdinalIgnoreCase);
+
+            // Hesap silinmiş ya da pasife alınmışsa oturumu sonlandır (her istekte kontrol)
+            if ((hesap is null || !hesap.Aktif) && !accountYolu)
+            {
+                context.Session.CikisYap();
+                context.Response.Redirect("/Account/Login");
+                return;
+            }
+
+            // Bekleyen davet sayısı (navbar rozeti için)
             context.Items["BekleyenDavet"] = await db.ProjeDavetleri
                 .CountAsync(d => d.KullaniciId == uid.Value && d.Durum == DavetDurum.Bekliyor);
         }

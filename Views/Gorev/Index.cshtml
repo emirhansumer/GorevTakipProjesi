@@ -256,13 +256,22 @@ else
                                 <a asp-action="Edit" asp-route-id="@gorev.Id" class="btn btn-sm btn-outline-primary" title="Düzenle">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <button type="button" class="btn btn-sm btn-outline-danger" title="Sil"
-                                        onclick="GorevTakip.silOnayi('sil-form-@gorev.Id', { text: '@Html.Raw(Html.Encode(gorev.Baslik)) görevi silinecek. Emin misin?' })">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                                <form id="sil-form-@gorev.Id" asp-action="Delete" asp-route-id="@gorev.Id" method="post" class="d-none">
-                                    @Html.AntiForgeryToken()
-                                </form>
+                                @if (gorev.AtayanId == null)
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Sil"
+                                            onclick="GorevTakip.silOnayi('sil-form-@gorev.Id', { text: '@Html.Raw(Html.Encode(gorev.Baslik)) görevi silinecek. Emin misin?' })">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    <form id="sil-form-@gorev.Id" asp-action="Delete" asp-route-id="@gorev.Id" method="post" class="d-none">
+                                        @Html.AntiForgeryToken()
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="btn btn-sm btn-outline-secondary disabled" title="Atanan görev — yalnızca atayan lider kaldırabilir">
+                                        <i class="bi bi-lock"></i>
+                                    </span>
+                                }
                             </td>
                         </tr>
                     }
