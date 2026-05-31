@@ -44,6 +44,12 @@ public class HomeController : Controller
         return View(model);
     }
 
+    // KVKK Aydınlatma Metni — giriş gerektirmez (herkese açık)
+    public IActionResult Kvkk()
+    {
+        return View();
+    }
+
     // Bakım modu sayfası — giriş gerektirmez. Admin gelirse normale yönlendirilir.
     public IActionResult Bakim()
     {

@@ -26,4 +26,9 @@ public class RegisterViewModel
     [Compare(nameof(Sifre), ErrorMessage = "Şifreler eşleşmiyor.")]
     [Display(Name = "Şifre Tekrarı")]
     public string SifreTekrar { get; set; } = string.Empty;
+
+    // KVKK aydınlatma metni onayı — kayıt için zorunlu (true olmalı)
+    [Range(typeof(bool), "true", "true", ErrorMessage = "Kayıt için KVKK Aydınlatma Metni'ni onaylamalısın.")]
+    [Display(Name = "KVKK Onayı")]
+    public bool KvkkOnay { get; set; }
 }
