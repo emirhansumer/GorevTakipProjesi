@@ -70,7 +70,7 @@ public class AdminController : Controller
         }
 
         var liste = await sorgu
-            .OrderByDescending(k => k.IsAdmin)
+            .OrderByDescending(k => k.Rol)
             .ThenBy(k => k.AdSoyad)
             .Select(k => new KullaniciOzet
             {
@@ -219,14 +219,14 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Kullanicilar));
     }
 
-    // Admin yetkisini aç/kapat — kendi yetkini değiştiremezsin (kilitlenme önlemi)
+    // Kullanıcının rolünü değiştir — kendi rolünü değiştiremezsin (kilitlenme önlemi)
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AdminYetkiToggle(int id)
+    public async Task<IActionResult> RolDegistir(int id, KullaniciRol rol)
     {
         if (id == AktifKullaniciId)
         {
-            TempData["Hata"] = "Kendi yetkini değiştiremezsin.";
+            TempData["Hata"] = "Kendi rolünü değiştiremezsin.";
             return RedirectToAction(nameof(Kullanicilar));
         }
 
@@ -237,12 +237,10 @@ public class AdminController : Controller
             return RedirectToAction(nameof(Kullanicilar));
         }
 
-        kullanici.IsAdmin = !kullanici.IsAdmin;
+        kullanici.Rol = rol;
         await _db.SaveChangesAsync();
 
-        TempData["Basari"] = kullanici.IsAdmin
-            ? $"\"{kullanici.AdSoyad}\" artık sistem yöneticisi."
-            : $"\"{kullanici.AdSoyad}\" kullanıcısının yöneticilik yetkisi kaldırıldı.";
+        TempData["Basari"] = $"\"{kullanici.AdSoyad}\" kullanıcısının rolü artık: {rol.Etiket()}.";
         return RedirectToAction(nameof(Kullanicilar));
     }
 
@@ -323,13 +321,13 @@ public class AdminController : Controller
     public async Task<IActionResult> KullanicilarCsv()
     {
         var liste = await _db.Kullanicilar
-            .Select(k => new { k.AdSoyad, k.Email, k.IsAdmin, k.Aktif, k.KayitTarihi, GorevSayisi = k.Gorevler.Count })
+            .Select(k => new { k.AdSoyad, k.Email, k.Rol, k.Aktif, k.KayitTarihi, GorevSayisi = k.Gorevler.Count })
             .ToListAsync();
 
         var sb = new StringBuilder();
-        sb.AppendLine("Ad Soyad;E-posta;Admin;Aktif;Kayit Tarihi;Gorev Sayisi");
+        sb.AppendLine("Ad Soyad;E-posta;Rol;Aktif;Kayit Tarihi;Gorev Sayisi");
         foreach (var k in liste)
-            sb.AppendLine($"{CsvKacis(k.AdSoyad)};{CsvKacis(k.Email)};{(k.IsAdmin ? "Evet" : "Hayir")};{(k.Aktif ? "Evet" : "Hayir")};{k.KayitTarihi:dd.MM.yyyy HH:mm};{k.GorevSayisi}");
+            sb.AppendLine($"{CsvKacis(k.AdSoyad)};{CsvKacis(k.Email)};{CsvKacis(k.Rol.Etiket())};{(k.Aktif ? "Evet" : "Hayir")};{k.KayitTarihi:dd.MM.yyyy HH:mm};{k.GorevSayisi}");
 
         return CsvDosya(sb.ToString(), "kullanicilar.csv");
     }

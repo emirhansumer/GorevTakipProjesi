@@ -23,7 +23,7 @@ public static class DbSeeder
                 AdSoyad = "Site Yöneticisi",
                 Email = AdminEmail,
                 SifreHash = BCrypt.Net.BCrypt.HashPassword(AdminSifre),
-                IsAdmin = true,
+                Rol = KullaniciRol.Yonetici,
                 Aktif = true,
                 KayitTarihi = DateTime.Now
             });

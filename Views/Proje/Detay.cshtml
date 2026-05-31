@@ -1,0 +1,222 @@
+@model ProjeDetayViewModel
+@{
+    ViewData["Title"] = Model.Proje.Ad;
+    var p = Model.Proje;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-kanban me-2 text-primary"></i> @p.Ad</h2>
+        <p class="text-muted mb-0 small">@(string.IsNullOrWhiteSpace(p.Aciklama) ? "Açıklama yok" : p.Aciklama)</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Projelerim</a>
+        <button type="button" class="btn btn-outline-danger"
+                onclick="GorevTakip.silOnayi('proje-sil', { text: '@Html.Raw(Html.Encode(p.Ad)) projesi, üyelikleri ve atanan görevleri silinecek. Emin misin?' })">
+            <i class="bi bi-trash me-1"></i> Projeyi Sil
+        </button>
+        <form id="proje-sil" asp-action="ProjeSil" asp-route-id="@p.Id" method="post" class="d-none">@Html.AntiForgeryToken()</form>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between mb-1">
+            <span class="fw-semibold"><i class="bi bi-graph-up-arrow me-1 text-primary"></i> İlerleme</span>
+            <span class="fw-bold text-success">%@Model.Yuzde</span>
+        </div>
+        <div class="progress" style="height: 9px;">
+            <div class="progress-bar bg-success" style="width:@Model.Yuzde%"></div>
+        </div>
+        <div class="text-muted small mt-1">@Model.TamamlananGorev / @Model.GorevSayisi görev tamamlandı · @Model.Uyeler.Count üye</div>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <!-- Üyeler + davet -->
+    <div class="col-12 col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header"><span class="fw-semibold"><i class="bi bi-people me-1 text-primary"></i> Üyeler (@Model.Uyeler.Count)</span></div>
+            <div class="card-body">
+                <form asp-action="UyeDavet" asp-route-projeId="@p.Id" method="post" class="mb-3">
+                    @Html.AntiForgeryToken()
+                    <label class="form-label small text-muted">E-posta ile davet et</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                        <input type="email" name="email" class="form-control" placeholder="kullanici@ornek.com" required />
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-send me-1"></i> Davet</button>
+                    </div>
+                </form>
+
+                @if (!Model.Uyeler.Any())
+                {
+                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i> Henüz üye yok. E-postayla davet gönder.</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var u in Model.Uyeler)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span><i class="bi bi-person-circle me-2 text-muted"></i>@u.Kullanici?.AdSoyad <span class="text-muted small">@u.Kullanici?.Email</span></span>
+                                <form asp-action="UyeCikar" asp-route-projeId="@p.Id" asp-route-kullaniciId="@u.KullaniciId" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Çıkar"><i class="bi bi-person-dash"></i></button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Bekleyen davetler -->
+    <div class="col-12 col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header"><span class="fw-semibold"><i class="bi bi-hourglass-split me-1 text-primary"></i> Bekleyen Davetler (@Model.BekleyenDavetler.Count)</span></div>
+            <div class="card-body">
+                @if (!Model.BekleyenDavetler.Any())
+                {
+                    <p class="text-muted small mb-0">Bekleyen davet yok.</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var d in Model.BekleyenDavetler)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span><i class="bi bi-envelope-paper me-2 text-muted"></i>@d.Kullanici?.AdSoyad <span class="text-muted small">@d.Kullanici?.Email</span></span>
+                                <form asp-action="DavetIptal" asp-route-davetId="@d.Id" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Daveti iptal et"><i class="bi bi-x-lg"></i></button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Görev ata -->
+<div class="card shadow-sm mb-3">
+    <div class="card-header"><span class="fw-semibold"><i class="bi bi-plus-square me-1 text-primary"></i> Görev Ata</span></div>
+    <div class="card-body">
+        @if (!Model.Uyeler.Any())
+        {
+            <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i> Görev atamak için önce projeye üye ekle.</p>
+        }
+        else
+        {
+            <form asp-action="GorevAta" asp-route-projeId="@p.Id" method="post">
+                @Html.AntiForgeryToken()
+                <div class="row g-2">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label small">Başlık</label>
+                        <input type="text" name="baslik" class="form-control" placeholder="Görev başlığı" required />
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label small">Öncelik</label>
+                        <select name="oncelik" class="form-select">
+                            @foreach (var o in Enum.GetValues<Oncelik>())
+                            {
+                                <option value="@o" selected="@(o == Oncelik.Orta)">@o.Etiket()</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label small">Bitiş</label>
+                        <input type="date" name="bitisTarihi" class="form-control" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small">Açıklama (isteğe bağlı)</label>
+                        <textarea name="aciklama" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small d-block">Kime atanacak?</label>
+                        <div class="d-flex flex-wrap gap-3">
+                            @foreach (var u in Model.Uyeler)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="uyeIdler" value="@u.KullaniciId" id="uye-@u.KullaniciId" />
+                                    <label class="form-check-label" for="uye-@u.KullaniciId">@u.Kullanici?.AdSoyad</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3"><i class="bi bi-send-check me-1"></i> Görevi Ata</button>
+            </form>
+        }
+    </div>
+</div>
+
+<!-- Atanan görevler -->
+<div class="card shadow-sm">
+    <div class="card-header"><span class="fw-semibold"><i class="bi bi-list-task me-1 text-primary"></i> Atanan Görevler (@Model.Gorevler.Count)</span></div>
+    <div class="card-body p-0">
+        @if (!Model.Gorevler.Any())
+        {
+            <div class="empty-state"><i class="bi bi-clipboard-x empty-icon"></i><p class="mb-0">Henüz görev atanmadı.</p></div>
+        }
+        else
+        {
+            <table class="table align-middle mb-0">
+                <thead><tr><th>Görev</th><th>Kime</th><th>Öncelik</th><th>Durum</th><th>Bitiş</th><th class="text-end">İşlem</th></tr></thead>
+                <tbody>
+                    @foreach (var g in Model.Gorevler)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@g.Baslik</td>
+                            <td class="text-muted small"><i class="bi bi-person me-1"></i>@g.Kullanici?.AdSoyad</td>
+                            <td><span class="badge oncelik-badge @g.Oncelik.CssClass()"><i class="bi @g.Oncelik.Ikon() me-1"></i>@g.Oncelik.Etiket()</span></td>
+                            <td><span class="badge @g.Durum.CssClass()"><i class="bi @g.Durum.Ikon() me-1"></i>@g.Durum.Etiket()</span></td>
+                            <td class="text-muted small">@(g.BitisTarihi?.ToString("dd.MM.yyyy") ?? "—")</td>
+                            <td class="text-end text-nowrap">
+                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#duzenle-@g.Id" title="Düzenle"><i class="bi bi-pencil"></i></button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" title="Atamayı geri al"
+                                        onclick="GorevTakip.silOnayi('atama-iptal-@g.Id', { text: '@Html.Raw(Html.Encode(g.Baslik)) ataması geri alınacak (görev silinir). Emin misin?' })">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                                <form id="atama-iptal-@g.Id" asp-action="AtamaIptal" asp-route-gorevId="@g.Id" method="post" class="d-none">@Html.AntiForgeryToken()</form>
+                            </td>
+                        </tr>
+                        <tr class="collapse" id="duzenle-@g.Id">
+                            <td colspan="6" class="bg-body-tertiary">
+                                <form asp-action="AtamaDuzenle" asp-route-gorevId="@g.Id" method="post" class="row g-2 align-items-end py-2">
+                                    @Html.AntiForgeryToken()
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label small mb-0">Başlık</label>
+                                        <input type="text" name="baslik" value="@g.Baslik" class="form-control form-control-sm" required />
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label class="form-label small mb-0">Öncelik</label>
+                                        <select name="oncelik" class="form-select form-select-sm">
+                                            @foreach (var o in Enum.GetValues<Oncelik>())
+                                            {
+                                                <option value="@o" selected="@(o == g.Oncelik)">@o.Etiket()</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label class="form-label small mb-0">Bitiş</label>
+                                        <input type="date" name="bitisTarihi" value="@(g.BitisTarihi?.ToString("yyyy-MM-dd"))" class="form-control form-control-sm" />
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <label class="form-label small mb-0">Açıklama</label>
+                                        <input type="text" name="aciklama" value="@g.Aciklama" class="form-control form-control-sm" />
+                                    </div>
+                                    <div class="col-12 col-md-1">
+                                        <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-check-lg"></i></button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

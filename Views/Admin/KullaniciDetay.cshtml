@@ -8,9 +8,9 @@
     <div>
         <h2 class="mb-0">
             <i class="bi bi-person-circle me-2 text-primary"></i> @k.AdSoyad
-            @if (k.IsAdmin)
+            @if (k.Rol != KullaniciRol.Kullanici)
             {
-                <span class="badge bg-primary ms-1"><i class="bi bi-shield-fill"></i> Sistem Yöneticisi</span>
+                <span class="badge @k.Rol.BadgeClass() ms-1"><i class="bi @k.Rol.Ikon()"></i> @k.Rol.Etiket()</span>
             }
             @if (!k.Aktif)
             {

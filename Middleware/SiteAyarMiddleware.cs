@@ -18,6 +18,14 @@ public class SiteAyarMiddleware
         var ayar = await db.SiteAyarlari.AsNoTracking().FirstOrDefaultAsync() ?? new SiteAyar();
         context.Items["SiteAyar"] = ayar;
 
+        // Giriş yapan kullanıcının bekleyen davet sayısı (navbar rozeti için)
+        var uid = context.Session.GetKullaniciId();
+        if (uid.HasValue)
+        {
+            context.Items["BekleyenDavet"] = await db.ProjeDavetleri
+                .CountAsync(d => d.KullaniciId == uid.Value && d.Durum == DavetDurum.Bekliyor);
+        }
+
         if (ayar.BakimModu && !context.Session.AdminMi())
         {
             var path = context.Request.Path.Value ?? string.Empty;

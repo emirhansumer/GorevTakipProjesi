@@ -112,9 +112,9 @@
                     <tr>
                         <td>
                             <a asp-action="KullaniciDetay" asp-route-id="@ozet.Kullanici.Id" class="gorev-baslik-link fw-semibold">@ozet.Kullanici.AdSoyad</a>
-                            @if (ozet.Kullanici.IsAdmin)
+                            @if (ozet.Kullanici.Rol != KullaniciRol.Kullanici)
                             {
-                                <span class="badge bg-primary ms-1"><i class="bi bi-shield-fill"></i> Sistem Yöneticisi</span>
+                                <span class="badge @ozet.Kullanici.Rol.BadgeClass() ms-1"><i class="bi @ozet.Kullanici.Rol.Ikon()"></i> @ozet.Kullanici.Rol.Etiket()</span>
                             }
                             @if (!ozet.Kullanici.Aktif)
                             {

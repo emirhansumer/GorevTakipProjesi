@@ -163,6 +163,12 @@ else
                                 <a asp-action="Detail" asp-route-id="@gorev.Id" class="gorev-baslik-link fw-semibold">
                                     @gorev.Baslik
                                 </a>
+                                @if (gorev.AtayanId != null)
+                                {
+                                    <span class="badge bg-info text-dark ms-1" title="@gorev.Atayan?.AdSoyad tarafından atandı">
+                                        <i class="bi bi-pin-angle"></i> Atandı@(gorev.Proje != null ? " · " + gorev.Proje.Ad : "")
+                                    </span>
+                                }
                                 @if (!string.IsNullOrWhiteSpace(gorev.Aciklama))
                                 {
                                     <div class="text-muted small text-truncate" style="max-width:400px;">
