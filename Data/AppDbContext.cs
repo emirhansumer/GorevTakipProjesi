@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<Proje> Projeler => Set<Proje>();
     public DbSet<ProjeUye> ProjeUyeleri => Set<ProjeUye>();
     public DbSet<ProjeDavet> ProjeDavetleri => Set<ProjeDavet>();
+    public DbSet<IletisimMesaji> IletisimMesajlari => Set<IletisimMesaji>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

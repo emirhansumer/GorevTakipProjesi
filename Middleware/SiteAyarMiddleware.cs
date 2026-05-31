@@ -40,15 +40,23 @@ public class SiteAyarMiddleware
             // Bekleyen davet sayısı (navbar rozeti için)
             context.Items["BekleyenDavet"] = await db.ProjeDavetleri
                 .CountAsync(d => d.KullaniciId == uid.Value && d.Durum == DavetDurum.Bekliyor);
+
+            // Yöneticiye okunmamış iletişim mesajı sayısı (navbar rozeti için)
+            if (context.Session.AdminMi())
+            {
+                context.Items["OkunmamisMesaj"] = await db.IletisimMesajlari.CountAsync(m => !m.Okundu);
+            }
         }
 
         if (ayar.BakimModu && !context.Session.AdminMi())
         {
             var path = context.Request.Path.Value ?? string.Empty;
-            // Bakım modunda bile erişilebilir: giriş/çıkış, admin paneli, bakım sayfası
+            // Bakım modunda bile erişilebilir: giriş/çıkış, admin paneli, bakım/yasal/iletişim sayfaları
             var izinli = path.StartsWith("/Account", StringComparison.OrdinalIgnoreCase)
                       || path.StartsWith("/Admin", StringComparison.OrdinalIgnoreCase)
-                      || path.StartsWith("/Home/Bakim", StringComparison.OrdinalIgnoreCase);
+                      || path.StartsWith("/Home/Bakim", StringComparison.OrdinalIgnoreCase)
+                      || path.StartsWith("/Home/Kvkk", StringComparison.OrdinalIgnoreCase)
+                      || path.StartsWith("/Home/Iletisim", StringComparison.OrdinalIgnoreCase);
 
             if (!izinli)
             {

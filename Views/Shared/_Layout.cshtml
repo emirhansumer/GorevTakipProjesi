@@ -9,6 +9,7 @@
     var admin = session?.AdminMi() ?? false;
     var projeLideri = session?.ProjeLideriVeUstu() ?? false;
     var bekleyenDavet = (HttpContextAccessor.HttpContext?.Items["BekleyenDavet"] as int?) ?? 0;
+    var okunmamisMesaj = (HttpContextAccessor.HttpContext?.Items["OkunmamisMesaj"] as int?) ?? 0;
     var siteAyar = HttpContextAccessor.HttpContext?.Items["SiteAyar"] as SiteAyar;
     var kayitAcik = siteAyar?.KayitAcik ?? true;
     var routeData = ViewContext.RouteData.Values;
@@ -115,8 +116,17 @@
                             @if (admin)
                             {
                                 <li class="nav-item">
-                                    <a class="@NavClass("Admin")" asp-controller="Admin" asp-action="Index">
+                                    <a class="@NavClass("Admin", "Index", "Kullanicilar", "KullaniciDetay", "Gorevler", "Ayarlar")" asp-controller="Admin" asp-action="Index">
                                         <i class="bi bi-shield-lock me-1"></i> Yönetim
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="@NavClass("Admin", "Mesajlar")" asp-controller="Admin" asp-action="Mesajlar">
+                                        <i class="bi bi-inbox me-1"></i> Mesajlar
+                                        @if (okunmamisMesaj > 0)
+                                        {
+                                            <span class="badge bg-danger rounded-pill ms-1">@okunmamisMesaj</span>
+                                        }
                                     </a>
                                 </li>
                             }
@@ -210,6 +220,7 @@
             <span>
                 &copy; 2026 - Görev Takip Sistemi
                 <a asp-controller="Home" asp-action="Kvkk" class="ms-2 small text-decoration-none">KVKK</a>
+                <a asp-controller="Home" asp-action="Iletisim" class="ms-2 small text-decoration-none">İletişim</a>
             </span>
             <span class="small">
                 <i class="bi bi-code-slash me-1"></i> ASP.NET Core MVC + EF Core + SQLite

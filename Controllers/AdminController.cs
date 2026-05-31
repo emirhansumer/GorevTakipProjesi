@@ -287,6 +287,43 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Gorevler));
     }
 
+    // --- İletişim mesajları (gelen kutusu) ---
+
+    public async Task<IActionResult> Mesajlar()
+    {
+        var liste = await _db.IletisimMesajlari
+            .OrderByDescending(m => m.OlusturmaTarihi)
+            .ToListAsync();
+        return View(liste);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> MesajOkundu(int id)
+    {
+        var mesaj = await _db.IletisimMesajlari.FindAsync(id);
+        if (mesaj is not null)
+        {
+            mesaj.Okundu = !mesaj.Okundu;
+            await _db.SaveChangesAsync();
+        }
+        return RedirectToAction(nameof(Mesajlar));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> MesajSil(int id)
+    {
+        var mesaj = await _db.IletisimMesajlari.FindAsync(id);
+        if (mesaj is not null)
+        {
+            _db.IletisimMesajlari.Remove(mesaj);
+            await _db.SaveChangesAsync();
+            TempData["Basari"] = "Mesaj silindi.";
+        }
+        return RedirectToAction(nameof(Mesajlar));
+    }
+
     // --- Site ayarları ---
 
     public async Task<IActionResult> Ayarlar()
